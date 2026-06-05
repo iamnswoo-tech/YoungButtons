@@ -1,0 +1,2132 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>스마트폰으로 측정하는 몸과 마음 건강</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=Bebas+Neue&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --ink:    #0b0e17;
+    --ink2:   #1e2235;
+    --paper:  #f4f2ed;
+    --paper2: #eae8e1;
+    --cream:  #faf9f6;
+    --accent: #e84c3d;   /* 포인트 레드 */
+    --indigo: #3d52d5;
+    --teal:   #0ea5a0;
+    --coral:  #f05454;
+    --gold:   #c9a84c;
+    --muted:  #7b7d8a;
+    --border: rgba(11,14,23,.10);
+    --r: 16px;
+    --sans: 'Noto Sans KR', sans-serif;
+    --display: 'Bebas Neue', sans-serif;
+    --serif: 'DM Serif Display', serif;
+  }
+
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: var(--sans);
+    background: var(--cream);
+    color: var(--ink);
+    overflow-x: hidden;
+    line-height: 1.6;
+  }
+
+  /* ── 노이즈 텍스처 오버레이 ── */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none; z-index: 9999; opacity: .5;
+  }
+
+  /* ══════════════════════════════
+     NAV
+  ══════════════════════════════ */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 18px 40px;
+    background: rgba(244,242,237,.85);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+  }
+  .nav-logo {
+    font-family: var(--display);
+    font-size: 1.6rem; letter-spacing: .04em;
+    color: var(--ink);
+  }
+  .nav-logo span { color: var(--accent); }
+  .nav-links { display: flex; gap: 32px; list-style: none; }
+  .nav-links a {
+    font-size: .85rem; font-weight: 500; color: var(--ink);
+    text-decoration: none; letter-spacing: .02em;
+    opacity: .7; transition: opacity .2s;
+  }
+  .nav-links a:hover { opacity: 1; }
+  .nav-cta {
+    background: var(--ink); color: var(--paper);
+    font-size: .82rem; font-weight: 700; letter-spacing: .04em;
+    padding: 10px 22px; border-radius: 50px;
+    text-decoration: none; transition: background .2s, transform .15s;
+  }
+  .nav-cta:hover { background: var(--accent); transform: translateY(-1px); }
+
+  /* ══════════════════════════════
+     HERO
+  ══════════════════════════════ */
+  .hero {
+    min-height: 100vh;
+    display: grid; grid-template-columns: 1fr 1fr;
+    align-items: center;
+    padding: 120px 40px 80px;
+    gap: 60px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::after {
+    content: '';
+    position: absolute; right: -120px; top: 50%;
+    transform: translateY(-50%);
+    width: 700px; height: 700px;
+    background: radial-gradient(circle, rgba(61,82,213,.07) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero-bg-text {
+    position: absolute; left: -20px; top: 50%; transform: translateY(-50%);
+    font-family: var(--display);
+    font-size: 22vw; color: transparent;
+    -webkit-text-stroke: 1px rgba(11,14,23,.05);
+    pointer-events: none; user-select: none;
+    line-height: 1; white-space: nowrap;
+    z-index: 0;
+  }
+  .hero-left { position: relative; z-index: 1; }
+  .hero-eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(61,82,213,.1); color: var(--indigo);
+    font-size: .78rem; font-weight: 700; letter-spacing: .1em;
+    padding: 6px 14px; border-radius: 50px;
+    margin-bottom: 28px;
+  }
+  .hero-eyebrow::before {
+    content: '●'; font-size: .5rem; animation: blink 1.6s ease infinite;
+  }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.2} }
+
+  .hero-h1 {
+    font-family: var(--display);
+    font-size: clamp(3.2rem, 6vw, 5.5rem);
+    line-height: .95; letter-spacing: .02em;
+    margin-bottom: 10px;
+  }
+  .hero-h1 em {
+    font-family: var(--serif); font-style: italic;
+    color: var(--accent); font-size: 1.05em;
+  }
+  .hero-sub-h1 {
+    font-family: var(--display);
+    font-size: clamp(1.6rem, 3vw, 2.8rem);
+    color: var(--muted); letter-spacing: .04em;
+    margin-bottom: 28px;
+  }
+  .hero-desc {
+    font-size: 1.05rem; line-height: 1.75; color: var(--ink2);
+    max-width: 480px; margin-bottom: 40px; font-weight: 400;
+  }
+  .hero-desc strong { color: var(--accent); font-weight: 700; }
+  .hero-actions { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+  .btn-primary {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--ink); color: var(--paper);
+    font-family: var(--sans); font-size: .9rem; font-weight: 700;
+    letter-spacing: .04em;
+    padding: 16px 32px; border-radius: 50px;
+    text-decoration: none; transition: all .2s;
+    box-shadow: 0 6px 30px rgba(11,14,23,.2);
+  }
+  .btn-primary:hover { background: var(--accent); transform: translateY(-2px); box-shadow: 0 12px 40px rgba(232,76,61,.3); }
+  .btn-secondary {
+    font-size: .88rem; font-weight: 600; color: var(--ink);
+    text-decoration: none; letter-spacing: .02em;
+    border-bottom: 2px solid var(--ink); padding-bottom: 2px;
+    transition: color .2s, border-color .2s;
+  }
+  .btn-secondary:hover { color: var(--accent); border-color: var(--accent); }
+
+  .hero-stats {
+    display: flex; gap: 32px; margin-top: 48px;
+    padding-top: 32px;
+    border-top: 1px solid var(--border);
+  }
+  .hero-stat-num {
+    font-family: var(--display); font-size: 2.2rem; color: var(--ink);
+    line-height: 1;
+  }
+  .hero-stat-label { font-size: .75rem; color: var(--muted); margin-top: 2px; letter-spacing: .04em; }
+
+  /* 폰 목업 */
+  .hero-right {
+    position: relative; z-index: 1;
+    display: flex; justify-content: center; align-items: center;
+  }
+  .phone-mockup {
+    width: 280px; height: 560px;
+    background: var(--ink);
+    border-radius: 44px;
+    padding: 14px;
+    box-shadow: 0 40px 100px rgba(11,14,23,.35), 0 8px 20px rgba(11,14,23,.2);
+    position: relative;
+    animation: float 4s ease-in-out infinite;
+  }
+  @keyframes float {
+    0%,100%{transform:translateY(0) rotate(-2deg)} 50%{transform:translateY(-12px) rotate(-2deg)}
+  }
+  .phone-screen {
+    width: 100%; height: 100%;
+    background: #0b0e17;
+    border-radius: 32px;
+    overflow: hidden;
+    display: flex; flex-direction: column;
+  }
+  .phone-notch {
+    width: 70px; height: 18px;
+    background: var(--ink);
+    border-radius: 0 0 12px 12px;
+    margin: 0 auto;
+    position: absolute; top: 14px; left: 50%; transform: translateX(-50%);
+    z-index: 2;
+  }
+  .phone-header {
+    background: linear-gradient(135deg, #1a1f35, #0f1628);
+    padding: 40px 16px 20px;
+    text-align: center; border-bottom: 1px solid rgba(255,255,255,.05);
+  }
+  .phone-header-title { font-size: 11px; color: rgba(255,255,255,.5); letter-spacing: .08em; }
+  .phone-score-ring {
+    width: 90px; height: 90px;
+    border-radius: 50%;
+    background: conic-gradient(#22c55e 0deg 282deg, rgba(255,255,255,.06) 282deg);
+    display: flex; align-items: center; justify-content: center;
+    margin: 12px auto 8px;
+    position: relative;
+  }
+  .phone-score-ring::before {
+    content: '';
+    position: absolute; inset: 8px;
+    background: #0f1628; border-radius: 50%;
+  }
+  .phone-score-num {
+    font-family: var(--display); font-size: 26px; color: #22c55e;
+    position: relative; z-index: 1; line-height: 1;
+  }
+  .phone-score-label { font-size: 9px; color: rgba(255,255,255,.4); margin-top: 2px; }
+  .phone-metrics {
+    display: grid; grid-template-columns: 1fr 1fr 1fr;
+    gap: 6px; padding: 14px;
+  }
+  .phone-metric {
+    background: rgba(255,255,255,.04);
+    border-radius: 10px; padding: 8px 6px;
+    text-align: center;
+  }
+  .pm-val { font-size: 14px; font-weight: 700; color: #fff; }
+  .pm-unit { font-size: 7px; color: rgba(255,255,255,.4); }
+  .pm-lbl { font-size: 7px; color: rgba(255,255,255,.35); margin-top: 2px; }
+  .phone-cards { padding: 0 14px; display: flex; flex-direction: column; gap: 6px; }
+  .phone-card {
+    background: rgba(255,255,255,.04);
+    border-radius: 10px; padding: 9px 12px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .pc-icon { font-size: 14px; }
+  .pc-label { font-size: 9px; color: rgba(255,255,255,.5); }
+  .pc-val { font-size: 11px; font-weight: 700; color: #fff; margin-top: 1px; }
+  .pc-badge {
+    margin-left: auto; font-size: 7px; font-weight: 700;
+    padding: 2px 6px; border-radius: 50px;
+  }
+  .pc-badge.good { background: rgba(34,197,94,.15); color: #22c55e; }
+  .pc-badge.warn { background: rgba(245,158,11,.15); color: #f59e0b; }
+
+  /* 배경 장식 */
+  .hero-deco-circle {
+    position: absolute; border-radius: 50%;
+    background: radial-gradient(circle, var(--c, rgba(61,82,213,.15)) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  /* ══════════════════════════════
+     TRUST BAR
+  ══════════════════════════════ */
+  .trust-bar {
+    background: var(--ink); color: var(--paper);
+    padding: 24px 40px;
+    display: flex; align-items: center; justify-content: center; gap: 60px;
+    flex-wrap: wrap;
+  }
+  .trust-item { display: flex; align-items: center; gap: 10px; }
+  .trust-icon { font-size: 1.4rem; }
+  .trust-text { font-size: .82rem; font-weight: 500; letter-spacing: .04em; opacity: .85; }
+
+  /* ══════════════════════════════
+     섹션 공통
+  ══════════════════════════════ */
+  section { padding: 100px 40px; max-width: 1200px; margin: 0 auto; }
+  .section-full { max-width: none; padding-left: 0; padding-right: 0; }
+  .eyebrow {
+    font-size: .75rem; font-weight: 700; letter-spacing: .12em;
+    text-transform: uppercase; color: var(--muted);
+    margin-bottom: 12px;
+  }
+  .section-title {
+    font-family: var(--display);
+    font-size: clamp(2.4rem, 4vw, 3.8rem);
+    line-height: .95; letter-spacing: .02em;
+    margin-bottom: 16px;
+  }
+  .section-desc {
+    font-size: 1.05rem; color: var(--muted);
+    max-width: 560px; line-height: 1.7;
+    margin-bottom: 56px;
+  }
+
+  /* ══════════════════════════════
+     WHY — 핵심 차별점
+  ══════════════════════════════ */
+  .why-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+    background: var(--border);
+    border: 2px solid var(--border);
+    border-radius: var(--r);
+    overflow: hidden;
+  }
+  .why-card {
+    background: var(--cream); padding: 40px 32px;
+    transition: background .2s;
+  }
+  .why-card:hover { background: var(--paper2); }
+  .why-number {
+    font-family: var(--display); font-size: 4rem;
+    color: rgba(11,14,23,.06); line-height: 1;
+    margin-bottom: 12px;
+  }
+  .why-icon { font-size: 2rem; margin-bottom: 16px; }
+  .why-title {
+    font-size: 1.2rem; font-weight: 700; margin-bottom: 10px;
+  }
+  .why-desc { font-size: .9rem; color: var(--muted); line-height: 1.65; }
+
+  /* ══════════════════════════════
+     FEATURES — 기능 상세
+  ══════════════════════════════ */
+  .features-list { display: flex; flex-direction: column; gap: 80px; }
+  .feature-row {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 80px; align-items: center;
+  }
+  .feature-row.reverse { direction: rtl; }
+  .feature-row.reverse > * { direction: ltr; }
+
+  .feature-label {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: .72rem; font-weight: 700; letter-spacing: .1em;
+    padding: 4px 12px; border-radius: 50px;
+    margin-bottom: 16px; text-transform: uppercase;
+  }
+  .feature-title {
+    font-family: var(--display);
+    font-size: clamp(2rem, 3.5vw, 3rem);
+    line-height: 1; margin-bottom: 16px; letter-spacing: .02em;
+  }
+  .feature-desc {
+    font-size: .95rem; color: var(--muted); line-height: 1.75;
+    margin-bottom: 24px;
+  }
+  .feature-points { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+  .feature-points li {
+    display: flex; align-items: flex-start; gap: 10px;
+    font-size: .9rem; line-height: 1.55;
+  }
+  .feature-points li::before {
+    content: '→'; font-weight: 700; flex-shrink: 0; margin-top: 1px;
+  }
+
+  /* 기능 비주얼 박스 */
+  .feature-visual {
+    border-radius: 24px; overflow: hidden;
+    aspect-ratio: 4/3;
+    position: relative;
+    box-shadow: 0 20px 60px rgba(11,14,23,.12);
+  }
+  .fv-face { background: linear-gradient(135deg, #1a1f35 0%, #0d1530 100%); }
+  .fv-finger { background: linear-gradient(135deg, #1a0d14 0%, #200d20 100%); }
+  .fv-body { background: linear-gradient(135deg, #0d1a18 0%, #0a1820 100%); }
+  .fv-mood { background: linear-gradient(135deg, #1a1520 0%, #120a20 100%); }
+  .fv-share { background: linear-gradient(135deg, #1a1800 0%, #0f1200 100%); }
+
+  .fv-inner {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 12px;
+    padding: 30px;
+  }
+
+  /* 얼굴 측정 비주얼 */
+  .fv-face-ring {
+    width: 120px; height: 120px;
+    border-radius: 50%;
+    border: 3px solid rgba(94,135,255,.3);
+    display: flex; align-items: center; justify-content: center;
+    position: relative;
+    animation: face-scan 3s ease-in-out infinite;
+  }
+  @keyframes face-scan {
+    0%,100%{border-color:rgba(94,135,255,.3);box-shadow:0 0 0 0 rgba(94,135,255,0)}
+    50%{border-color:rgba(94,135,255,.9);box-shadow:0 0 0 20px rgba(94,135,255,0)}
+  }
+  .fv-face-ring::before {
+    content: '😊'; font-size: 48px;
+  }
+  .fv-metrics-row {
+    display: flex; gap: 10px; flex-wrap: wrap; justify-content: center;
+  }
+  .fv-metric-chip {
+    background: rgba(255,255,255,.06);
+    border: 1px solid rgba(255,255,255,.1);
+    border-radius: 10px; padding: 8px 14px; text-align: center;
+  }
+  .fvc-val { font-family: var(--display); font-size: 1.4rem; color: #fff; line-height: 1; }
+  .fvc-lbl { font-size: 8px; color: rgba(255,255,255,.4); margin-top: 2px; letter-spacing: .06em; }
+  .fvc-grade {
+    display: inline-block; font-size: 7px; font-weight: 700;
+    padding: 1px 6px; border-radius: 50px; margin-top: 3px;
+  }
+  .grade-g { background: rgba(34,197,94,.15); color: #22c55e; }
+  .grade-w { background: rgba(245,158,11,.15); color: #f59e0b; }
+  .grade-b { background: rgba(239,68,68,.15); color: #ef4444; }
+  .fv-adv-cards {
+    display: flex; gap: 8px; width: 100%;
+  }
+  .fv-adv-card {
+    flex: 1; background: rgba(255,255,255,.05);
+    border: 1px solid rgba(255,255,255,.08);
+    border-radius: 10px; padding: 10px; text-align: center;
+  }
+  .fac-icon { font-size: 14px; }
+  .fac-title { font-size: 7px; color: rgba(255,255,255,.4); margin: 2px 0; letter-spacing: .04em; }
+  .fac-val { font-size: 11px; font-weight: 700; color: #fff; }
+
+  /* 손가락 측정 비주얼 */
+  .fv-finger-anim {
+    position: relative; width: 100px; height: 100px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .fv-pulse-ring {
+    position: absolute; border-radius: 50%;
+    border: 2px solid rgba(240,84,84,.6);
+    animation: pulse-ring 2s ease infinite;
+  }
+  .fv-pulse-ring:nth-child(1) { width: 60px; height: 60px; animation-delay: 0s; }
+  .fv-pulse-ring:nth-child(2) { width: 80px; height: 80px; animation-delay: .4s; }
+  .fv-pulse-ring:nth-child(3) { width: 100px; height: 100px; animation-delay: .8s; }
+  @keyframes pulse-ring {
+    0%{opacity:.8;transform:scale(.8)} 100%{opacity:0;transform:scale(1.2)}
+  }
+  .fv-finger-icon { font-size: 36px; position: relative; z-index: 1; }
+  .fv-waveform {
+    width: 100%; height: 40px; position: relative; overflow: hidden;
+  }
+  .fv-waveform svg { width: 200%; height: 100%; animation: wave-scroll 2s linear infinite; }
+  @keyframes wave-scroll { from{transform:translateX(0)} to{transform:translateX(-50%)} }
+
+  /* 신체 측정 비주얼 */
+  .fv-body-grid {
+    display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; width: 100%;
+  }
+  .fv-body-item {
+    background: rgba(255,255,255,.05); border-radius: 10px;
+    padding: 10px 12px; display: flex; align-items: center; gap: 8px;
+  }
+  .fbi-icon { font-size: 18px; }
+  .fbi-name { font-size: 9px; color: rgba(255,255,255,.5); }
+  .fbi-score { font-size: 13px; font-weight: 700; color: #22c55e; }
+
+  /* 감정 게임 비주얼 */
+  .fv-emotion-cards {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; width: 100%;
+  }
+  .fv-em-card {
+    background: rgba(255,255,255,.05); border-radius: 12px;
+    padding: 14px 8px; text-align: center;
+    cursor: default; transition: background .2s;
+    border: 1px solid rgba(255,255,255,.06);
+  }
+  .fv-em-card.selected { background: rgba(139,92,246,.25); border-color: #8b5cf6; }
+  .fv-em-icon { font-size: 22px; }
+  .fv-em-name { font-size: 8px; color: rgba(255,255,255,.5); margin-top: 4px; }
+  .fv-mental-score {
+    background: rgba(139,92,246,.12); border: 1px solid rgba(139,92,246,.3);
+    border-radius: 12px; padding: 14px 20px; text-align: center;
+    width: 100%;
+  }
+  .fms-label { font-size: 9px; color: rgba(139,92,246,.8); letter-spacing: .06em; }
+  .fms-val { font-family: var(--display); font-size: 2.4rem; color: #a78bfa; line-height: 1; margin: 4px 0; }
+  .fms-sub { font-size: 8px; color: rgba(255,255,255,.35); }
+
+  /* 안부 공유 비주얼 */
+  .fv-share-card {
+    background: rgba(255,255,255,.06); border-radius: 16px;
+    padding: 18px; width: 100%; border: 1px solid rgba(255,255,255,.1);
+  }
+  .fsc-header { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+  .fsc-avatar { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg,#f59e0b,#ef4444); display: flex; align-items: center; justify-content: center; font-size: 14px; }
+  .fsc-name { font-size: 11px; font-weight: 700; color: #fff; }
+  .fsc-sub { font-size: 9px; color: rgba(255,255,255,.4); }
+  .fsc-metrics { display: flex; gap: 8px; margin-top: 10px; }
+  .fsc-metric { flex:1; background: rgba(255,255,255,.04); border-radius: 8px; padding: 8px; text-align: center; }
+  .fscm-val { font-size: 12px; font-weight: 700; color: #22c55e; }
+  .fscm-lbl { font-size: 7px; color: rgba(255,255,255,.35); margin-top: 1px; }
+  .fsc-msg { font-size: 9px; color: rgba(255,255,255,.4); margin-top: 10px; text-align: center; }
+
+  /* ══════════════════════════════
+     ME-rPPG AI 섹션
+  ══════════════════════════════ */
+  .ai-section {
+    background: var(--ink);
+    padding: 100px 40px;
+  }
+  .ai-inner { max-width: 1200px; margin: 0 auto; }
+  .ai-section .section-title { color: var(--paper); }
+  .ai-section .section-desc { color: rgba(244,242,237,.5); }
+  .ai-section .eyebrow { color: rgba(244,242,237,.3); }
+
+  .ai-grid {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;
+  }
+  .ai-card {
+    background: rgba(255,255,255,.04);
+    border: 1px solid rgba(255,255,255,.07);
+    border-radius: var(--r); padding: 28px 22px;
+    transition: background .2s, border-color .2s;
+  }
+  .ai-card:hover { background: rgba(255,255,255,.07); border-color: rgba(255,255,255,.14); }
+  .ai-card-icon { font-size: 2rem; margin-bottom: 14px; }
+  .ai-card-title { font-size: 1rem; font-weight: 700; color: var(--paper); margin-bottom: 8px; }
+  .ai-card-desc { font-size: .83rem; color: rgba(244,242,237,.45); line-height: 1.6; }
+  .ai-card-badge {
+    display: inline-block; margin-top: 12px;
+    font-size: .7rem; font-weight: 700; letter-spacing: .06em;
+    padding: 3px 10px; border-radius: 50px;
+    background: rgba(99,102,241,.2); color: #818cf8;
+  }
+
+  /* AI 근거 배너 */
+  .ai-evidence {
+    margin-top: 40px; padding: 24px 32px;
+    background: rgba(255,255,255,.03);
+    border: 1px solid rgba(255,255,255,.06);
+    border-radius: var(--r);
+    display: flex; align-items: center; gap: 20px; flex-wrap: wrap;
+  }
+  .ai-evidence-label {
+    font-size: .72rem; font-weight: 700; letter-spacing: .1em;
+    color: rgba(244,242,237,.3); white-space: nowrap;
+  }
+  .ai-evidence-items { display: flex; gap: 12px; flex-wrap: wrap; }
+  .ae-chip {
+    font-size: .75rem; color: rgba(244,242,237,.5);
+    background: rgba(255,255,255,.04); border-radius: 6px;
+    padding: 4px 10px;
+  }
+
+  /* ══════════════════════════════
+     HOW IT WORKS
+  ══════════════════════════════ */
+  .how-steps {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 0; position: relative;
+  }
+  .how-steps::before {
+    content: '';
+    position: absolute; top: 28px; left: 10%; right: 10%;
+    height: 1px; background: var(--border);
+    z-index: 0;
+  }
+  .how-step { text-align: center; padding: 0 20px; position: relative; z-index: 1; }
+  .how-step-num {
+    width: 56px; height: 56px; border-radius: 50%;
+    background: var(--cream); border: 2px solid var(--border);
+    font-family: var(--display); font-size: 1.4rem;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 20px; color: var(--ink);
+    transition: background .2s, border-color .2s;
+  }
+  .how-step:hover .how-step-num { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+  .how-step-icon { font-size: 2rem; margin-bottom: 12px; }
+  .how-step-title { font-size: 1rem; font-weight: 700; margin-bottom: 8px; }
+  .how-step-desc { font-size: .85rem; color: var(--muted); line-height: 1.6; }
+
+  /* ══════════════════════════════
+     METRICS TABLE — 측정 지표 전체
+  ══════════════════════════════ */
+  .metrics-bg {
+    background: var(--paper2); padding: 100px 40px;
+  }
+  .metrics-inner { max-width: 1200px; margin: 0 auto; }
+  .metrics-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;
+  }
+  .metric-group {
+    border-radius: var(--r); overflow: hidden;
+    border: 1px solid var(--border);
+  }
+  .mg-header {
+    padding: 18px 22px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .mg-icon { font-size: 1.2rem; }
+  .mg-title { font-size: .9rem; font-weight: 700; }
+  .mg-items { background: var(--cream); }
+  .mg-item {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 22px; border-top: 1px solid var(--border);
+    font-size: .85rem;
+  }
+  .mg-item-name { color: var(--ink2); font-weight: 500; }
+  .mg-item-badge {
+    font-size: .7rem; font-weight: 700; letter-spacing: .04em;
+    padding: 2px 8px; border-radius: 50px;
+  }
+  .badge-ai  { background: rgba(99,102,241,.12); color: var(--indigo); }
+  .badge-new { background: rgba(232,76,61,.12);  color: var(--accent); }
+  .badge-std { background: rgba(11,14,23,.06);   color: var(--muted); }
+
+  /* 색상 테마별 헤더 */
+  .mg-header.face   { background: rgba(61,82,213,.1);  color: var(--indigo); }
+  .mg-header.finger { background: rgba(240,84,84,.1);  color: var(--coral); }
+  .mg-header.body   { background: rgba(14,165,160,.1); color: var(--teal); }
+  .mg-header.mood   { background: rgba(139,92,246,.1); color: #7c3aed; }
+  .mg-header.share  { background: rgba(201,168,76,.1); color: var(--gold); }
+  .mg-header.trend  { background: rgba(11,14,23,.06);  color: var(--ink); }
+
+  /* ══════════════════════════════
+     안전 원칙
+  ══════════════════════════════ */
+  .safety-bar {
+    background: var(--ink2); padding: 60px 40px;
+  }
+  .safety-inner { max-width: 1200px; margin: 0 auto; }
+  .safety-grid {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px;
+    margin-top: 40px;
+  }
+  .safety-item { display: flex; gap: 14px; align-items: flex-start; }
+  .si-icon { font-size: 1.6rem; flex-shrink: 0; margin-top: 2px; }
+  .si-title { font-size: .9rem; font-weight: 700; color: var(--paper); margin-bottom: 4px; }
+  .si-desc { font-size: .8rem; color: rgba(244,242,237,.45); line-height: 1.6; }
+  .safety-bar .section-title { color: var(--paper); font-size: 2rem; }
+  .safety-bar .eyebrow { color: rgba(244,242,237,.3); }
+
+  /* ══════════════════════════════
+     CTA FINAL
+  ══════════════════════════════ */
+  .cta-section {
+    padding: 120px 40px;
+    text-align: center;
+    position: relative; overflow: hidden;
+  }
+  .cta-section::before {
+    content: '';
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(232,76,61,.06) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .cta-section .section-title { font-size: clamp(2.8rem, 5vw, 5rem); margin-bottom: 20px; }
+  .cta-section .section-desc { margin: 0 auto 40px; text-align: center; }
+  .cta-actions { display: flex; align-items: center; justify-content: center; gap: 20px; flex-wrap: wrap; }
+  .cta-url {
+    font-size: .82rem; color: var(--muted); letter-spacing: .04em;
+    margin-top: 24px;
+  }
+  .cta-url a { color: var(--ink); font-weight: 700; text-decoration: none; border-bottom: 1px solid; }
+
+  /* ══════════════════════════════
+     FOOTER
+  ══════════════════════════════ */
+  footer {
+    background: var(--ink); color: rgba(244,242,237,.4);
+    padding: 48px 40px;
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: 20px;
+  }
+  .footer-logo {
+    font-family: var(--display); font-size: 1.8rem; color: var(--paper); letter-spacing: .04em;
+  }
+  .footer-logo span { color: var(--accent); }
+  .footer-note { font-size: .78rem; line-height: 1.7; max-width: 400px; }
+  .footer-links { display: flex; gap: 20px; flex-wrap: wrap; }
+  .footer-links a { font-size: .78rem; color: rgba(244,242,237,.4); text-decoration: none; transition: color .2s; }
+  .footer-links a:hover { color: var(--paper); }
+
+  /* ══════════════════════════════
+     스크롤 애니메이션
+  ══════════════════════════════ */
+  .reveal {
+    opacity: 0; transform: translateY(30px);
+    transition: opacity .7s ease, transform .7s ease;
+  }
+  .reveal.visible { opacity: 1; transform: none; }
+  .reveal-delay-1 { transition-delay: .1s; }
+  .reveal-delay-2 { transition-delay: .2s; }
+  .reveal-delay-3 { transition-delay: .3s; }
+  .reveal-delay-4 { transition-delay: .4s; }
+
+  /* ══════════════════════════════
+     RESPONSIVE
+  ══════════════════════════════ */
+  @media (max-width: 900px) {
+    nav { padding: 16px 20px; }
+    .nav-links { display: none; }
+    .hero { grid-template-columns: 1fr; padding: 100px 20px 60px; text-align: center; gap: 40px; }
+    .hero-stats { justify-content: center; }
+    .hero-actions { justify-content: center; }
+    .why-grid { grid-template-columns: 1fr; }
+    .feature-row, .feature-row.reverse { grid-template-columns: 1fr; direction: ltr; }
+    .ai-grid { grid-template-columns: repeat(2, 1fr); }
+    .how-steps { grid-template-columns: repeat(2, 1fr); gap: 32px; }
+    .how-steps::before { display: none; }
+    .metrics-grid { grid-template-columns: 1fr; }
+    .safety-grid { grid-template-columns: repeat(2, 1fr); }
+    section { padding: 60px 20px; }
+    .ai-section, .metrics-bg, .safety-bar { padding: 60px 20px; }
+    footer { padding: 40px 20px; flex-direction: column; }
+  }
+  @media (max-width: 600px) {
+    .ai-grid { grid-template-columns: 1fr; }
+    .safety-grid { grid-template-columns: 1fr; }
+    .trust-bar { gap: 24px; padding: 20px; }
+    .phone-mockup { width: 240px; height: 480px; }
+  }
+
+/* ═══ v19 디자인 토큰 (--navy --mint 등) ═══ */
+:root {
+  --navy:   #0A1628;
+  --navy2:  #0F2044;
+  --navy3:  #162B56;
+  --mint:   #00C4B4;
+  --mint2:  #2DD4C4;
+  --mintdk: #009B8E;
+  --mintlt: rgba(0,196,180,.12);
+  --white:  #FFFFFF;
+  --off:    #F5F7FA;
+  --td:     #0A1628;
+  --tm:     #3D5070;
+  --ts:     #7A90B0;
+  --coral:  #FF6B6B;
+  --purple: #7C5CFC;
+  --amber:  #F59E0B;
+  --green:  #10B981;
+  --sans: 'Pretendard', -apple-system, 'Apple SD Gothic Neo', sans-serif;
+  --ease: cubic-bezier(0.16,1,0.3,1);
+}
+
+/* ═══ v19 추가 섹션 CSS ═══ */
+.nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+  height: 62px; display: flex; align-items: center; justify-content: space-between;
+  padding: 0 clamp(16px,4vw,60px);
+  background: rgba(10,22,40,.94);
+  backdrop-filter: blur(20px) saturate(180%);
+  border-bottom: 1px solid rgba(255,255,255,.07);
+  transition: background .3s;
+}
+.nav-logo-mark {
+  width: 32px; height: 32px; border-radius: 9px;
+  background: var(--mint); display: flex; align-items: center; justify-content: center;
+  font-size: 16px;
+}
+.nav-logo-name { font-size: 16px; font-weight: 900; color: #fff; letter-spacing: -.025em; }
+.nav-menu { display: flex; gap: 28px; }
+.nav-menu a { font-size: 13px; font-weight: 600; color: rgba(255,255,255,.60); text-decoration: none; transition: color .2s; }
+.nav-menu a:hover { color: var(--mint); }
+.nav-cta:hover { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(0,196,180,.48); }
+@media(max-width:680px){ .nav-menu { display:none; } .nav { padding: 0 18px; } }
+.hero-glow1 { position: absolute; width: 800px; height: 800px; border-radius: 50%; top: -300px; left: 50%; transform: translateX(-50%); background: radial-gradient(circle, rgba(0,196,180,.13) 0%, transparent 65%); pointer-events: none; }
+.hero-glow2 { position: absolute; width: 500px; height: 500px; border-radius: 50%; bottom: -150px; right: -150px; background: radial-gradient(circle, rgba(124,92,252,.09) 0%, transparent 65%); pointer-events: none; }
+.dot { width: 6px; height: 6px; border-radius: 50%; background: var(--mint); animation: blink 2s ease infinite; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+@keyframes up { from{opacity:0;transform:translateY(18px)} to{opacity:1;transform:translateY(0)} }
+.hero-h1 .a { color: var(--mint); }
+.hero-sub {
+  font-size: clamp(14px,1.8vw,18px); color: rgba(255,255,255,.62);
+  line-height: 1.75; max-width: 560px; margin: 0 auto 36px;
+  animation: up .65s .16s both var(--ease);
+}
+.hero-btns {
+  display: flex; gap: 11px; flex-wrap: wrap; justify-content: center;
+  margin-bottom: 52px; animation: up .65s .22s both var(--ease);
+}
+.btn-p {
+  background: var(--mint); color: var(--navy2);
+  font-size: 15px; font-weight: 800; padding: 15px 34px; border-radius: 999px;
+  text-decoration: none; box-shadow: 0 6px 26px rgba(0,196,180,.42);
+  transition: transform .14s, box-shadow .14s;
+  display: inline-flex; align-items: center; gap: 7px;
+}
+.btn-p:hover { transform: translateY(-2px); box-shadow: 0 10px 34px rgba(0,196,180,.52); }
+.btn-g {
+  border: 1.5px solid rgba(255,255,255,.24); color: rgba(255,255,255,.78);
+  font-size: 15px; font-weight: 600; padding: 14px 28px; border-radius: 999px;
+  text-decoration: none; transition: border-color .2s, color .2s;
+}
+.btn-g:hover { border-color: var(--mint); color: var(--mint); }
+.mockup-wrap { animation: up .7s .3s both var(--ease); position: relative; z-index: 1; }
+.phone {
+  width: min(300px,82vw);
+  background: #111827; border-radius: 36px; padding: 11px;
+  box-shadow: 0 40px 120px rgba(0,0,0,.55), 0 0 0 1px rgba(255,255,255,.07);
+}
+.screen {
+  background: var(--navy2); border-radius: 28px;
+  overflow: hidden; aspect-ratio: 9/19.5;
+}
+.screen-inner { padding: 18px 14px; }
+.s-hello  { font-size: 10px; color: rgba(255,255,255,.45); margin-bottom: 1px; }
+.s-brand  { font-size: 14px; font-weight: 900; color: #fff; margin-bottom: 14px; }
+.ring-wrap { text-align: center; margin-bottom: 12px; position: relative; display: inline-block; left: 50%; transform: translateX(-50%); }
+.ring-svg { width: 110px; height: 110px; transform: rotate(-90deg); }
+.ring-bg   { fill: none; stroke: rgba(255,255,255,.07); stroke-width: 9; }
+.ring-fill { fill: none; stroke: var(--mint); stroke-width: 9; stroke-linecap: round; stroke-dasharray: 298; stroke-dashoffset: 56; animation: ringdraw 1.6s .6s both var(--ease); }
+@keyframes ringdraw { from{stroke-dashoffset:298} to{stroke-dashoffset:56} }
+.ring-inner { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; transform: rotate(90deg); }
+.ring-num { font-size: 26px; font-weight: 900; color: #fff; line-height: 1; }
+.ring-lbl { font-size: 8px; color: rgba(255,255,255,.45); margin-top: 1px; font-weight: 600; }
+.chip-row { display: flex; gap: 4px; flex-wrap: wrap; justify-content: center; margin-bottom: 10px; }
+.chip { font-size: 8px; font-weight: 700; padding: 3px 8px; border-radius: 999px; background: rgba(0,196,180,.15); color: var(--mint2); border: 1px solid rgba(0,196,180,.22); }
+.stat-row { display: flex; gap: 5px; }
+.stat { flex: 1; background: rgba(255,255,255,.06); border-radius: 9px; padding: 8px 5px; text-align: center; }
+.stat-icon { font-size: 13px; }
+.stat-v    { font-size: 12px; font-weight: 900; color: #fff; margin: 1px 0; }
+.stat-l    { font-size: 7px; color: rgba(255,255,255,.45); font-weight: 600; }
+.scroll-hint { position: absolute; bottom: 24px; left: 50%; transform: translateX(-50%); color: rgba(255,255,255,.30); font-size: 9px; font-weight: 700; letter-spacing: .10em; text-transform: uppercase; display: flex; flex-direction: column; align-items: center; gap: 5px; animation: bounce 2.4s ease infinite; }
+@keyframes bounce { 0%,100%{transform:translateX(-50%) translateY(0)} 55%{transform:translateX(-50%) translateY(7px)} }
+.stats-strip { background: var(--navy2); border-top: 1px solid rgba(255,255,255,.06); border-bottom: 1px solid rgba(255,255,255,.06); padding: 34px clamp(16px,5vw,60px); }
+.stats-inner { max-width: 900px; margin: 0 auto; display: flex; gap: clamp(24px,6vw,80px); flex-wrap: wrap; justify-content: center; }
+.stat-big { text-align: center; }
+.stat-big-num { font-size: clamp(28px,5vw,46px); font-weight: 900; color: var(--mint); letter-spacing: -.04em; line-height: 1; }
+.stat-big-lbl { font-size: 11px; font-weight: 600; color: rgba(255,255,255,.45); margin-top: 4px; letter-spacing: .04em; }
+.sec { padding: clamp(56px,9vw,108px) clamp(16px,5vw,60px); }
+.sec.dk  { background: var(--navy); color: #fff; }
+.sec.gy  { background: var(--off); }
+.sec.wh  { background: #fff; }
+.inner   { max-width: 1100px; margin: 0 auto; }
+.sec.dk .eyebrow { color: var(--mint2); }
+.sec.dk .eyebrow::before { background: var(--mint); }
+.h2 {
+  font-size: clamp(24px,4vw,50px); font-weight: 900;
+  letter-spacing: -.035em; line-height: 1.12; margin-bottom: 12px;
+}
+.h2 .a { color: var(--mint); }
+.sec.dk .h2 { color: #fff; }
+.lead { font-size: clamp(13px,1.5vw,16px); color: var(--tm); line-height: 1.75; max-width: 540px; }
+.sec.dk .lead { color: rgba(255,255,255,.60); }
+.center { text-align: center; }
+.center .lead { margin: 0 auto; }
+.rv { opacity: 0; transform: translateY(28px); transition: opacity .6s var(--ease), transform .6s var(--ease); }
+.rv.in { opacity: 1; transform: none; }
+.d1 { transition-delay: .10s; } .d2 { transition-delay: .18s; }
+.d3 { transition-delay: .26s; } .d4 { transition-delay: .34s; }
+.steps { display: grid; grid-template-columns: repeat(auto-fit,minmax(230px,1fr)); gap: 16px; margin-top: 48px; }
+.step {
+  background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08);
+  border-radius: 20px; padding: 26px;
+  transition: transform .2s, border-color .2s;
+}
+.step:hover { transform: translateY(-4px); border-color: rgba(0,196,180,.28); }
+.step-num { font-size: 10px; font-weight: 900; color: var(--mint); letter-spacing: .12em; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+.step-num::after { content: ''; flex: 1; height: 1px; background: rgba(0,196,180,.18); }
+.step-icon  { font-size: 34px; margin-bottom: 12px; }
+.step-title { font-size: 17px; font-weight: 900; color: #fff; margin-bottom: 7px; letter-spacing: -.02em; }
+.step-desc  { font-size: 12px; color: rgba(255,255,255,.58); line-height: 1.68; }
+.step-time  { margin-top: 14px; display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 700; color: var(--mint); background: rgba(0,196,180,.10); padding: 4px 10px; border-radius: 999px; }
+.feat-grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(276px,1fr)); gap: 14px; margin-top: 48px; }
+.fc {
+  background: #fff; border: 1px solid #E2E8F0; border-radius: 18px; padding: 24px;
+  position: relative; overflow: hidden;
+  transition: transform .2s, box-shadow .2s;
+}
+.fc::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--bar, var(--mint)); }
+.fc:hover { transform: translateY(-4px); box-shadow: 0 14px 44px rgba(15,32,68,.09); }
+.fc-icon { width: 50px; height: 50px; border-radius: 15px; display: flex; align-items: center; justify-content: center; font-size: 24px; margin-bottom: 14px; background: var(--ib, var(--mintlt)); }
+.fc-badge { display: inline-block; font-size: 9px; font-weight: 800; padding: 2px 8px; border-radius: 999px; margin-bottom: 7px; letter-spacing: .06em; text-transform: uppercase; }
+.fc-title { font-size: 15px; font-weight: 900; color: var(--td); margin-bottom: 7px; letter-spacing: -.018em; }
+.fc-desc  { font-size: 11px; color: var(--tm); line-height: 1.68; margin-bottom: 10px; }
+.fc-tags  { display: flex; flex-wrap: wrap; gap: 4px; }
+.fc-tag   { font-size: 9px; font-weight: 600; color: var(--ts); background: var(--off); padding: 2px 8px; border-radius: 999px; }
+.fc-cite  { font-size: 9px; color: #94A3B8; margin-top: 9px; font-style: italic; }
+.insight-split { display: grid; grid-template-columns: 1fr 1fr; gap: 44px; margin-top: 48px; align-items: center; }
+@media(max-width:760px){ .insight-split { grid-template-columns: 1fr; } }
+.ichips { display: flex; flex-direction: column; gap: 11px; }
+.ich {
+  display: flex; align-items: center; gap: 13px;
+  background: #fff; border: 1px solid #E2E8F0; border-radius: 15px; padding: 14px 16px;
+  box-shadow: 0 2px 10px rgba(15,32,68,.05);
+  transition: transform .18s, border-color .18s;
+}
+.ich:hover { transform: translateX(5px); border-color: rgba(0,196,180,.28); }
+.ich-ico  { font-size: 26px; flex-shrink: 0; }
+.ich-body { flex: 1; }
+.ich-title{ font-size: 13px; font-weight: 800; color: var(--td); margin-bottom: 2px; }
+.ich-desc { font-size: 11px; color: var(--tm); line-height: 1.5; }
+.ich-badge{ font-size: 9px; font-weight: 800; padding: 2px 8px; border-radius: 999px; }
+.iscr {
+  background: var(--navy2); border-radius: 26px; padding: 22px;
+  box-shadow: 0 22px 72px rgba(10,22,40,.32);
+  border: 1px solid rgba(255,255,255,.07);
+}
+.iscr-hd { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+.iscr-title { font-size: 13px; font-weight: 800; color: #fff; }
+.iscr-badge { font-size: 9px; font-weight: 700; color: var(--mint); background: rgba(0,196,180,.12); padding: 3px 9px; border-radius: 999px; }
+.big-score { text-align: center; margin-bottom: 12px; }
+.big-score-num { font-size: 52px; font-weight: 900; color: #fff; line-height: 1; font-variant-numeric: tabular-nums; }
+.big-score-sub  { font-size: 11px; color: rgba(255,255,255,.45); margin-top: 2px; }
+.iscr-chips { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 13px; }
+.iscr-chip { font-size: 10px; font-weight: 700; padding: 4px 10px; border-radius: 999px; border: 1px solid transparent; }
+.cp-peer   { background: #EEF2FF; color: #4338CA; border-color: #C7D2FE; }
+.cp-up     { background: #F0FDF4; color: #166534; border-color: #BBF7D0; }
+.cp-ans    { background: #FFF7ED; color: #9A3412; border-color: #FED7AA; }
+.prog { height: 4px; border-radius: 2px; background: rgba(255,255,255,.07); overflow: hidden; margin-bottom: 13px; }
+.prog-fill { height: 100%; border-radius: 2px; background: var(--mint); animation: progfill 1.4s .4s both var(--ease); }
+@keyframes progfill { from{width:0} }
+.iscr-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
+.im { background: rgba(255,255,255,.05); border-radius: 12px; padding: 12px; border: 1px solid rgba(255,255,255,.05); }
+.im-lbl { font-size: 8px; font-weight: 700; color: rgba(255,255,255,.45); text-transform: uppercase; letter-spacing: .07em; margin-bottom: 4px; }
+.im-val { font-size: 24px; font-weight: 900; font-variant-numeric: tabular-nums; line-height: 1; }
+.im-unit{ font-size: 9px; color: rgba(255,255,255,.40); margin-left: 2px; }
+.im-sub { font-size: 9px; color: rgba(255,255,255,.40); margin-top: 3px; font-weight: 600; }
+.game-split { display: grid; grid-template-columns: 1fr 1fr; gap: 44px; margin-top: 48px; align-items: center; }
+@media(max-width:760px){ .game-split { grid-template-columns: 1fr; } }
+.gfeats { display: flex; flex-direction: column; gap: 13px; }
+.gf {
+  display: flex; gap: 14px; align-items: flex-start;
+  background: #fff; border: 1px solid #E2E8F0; border-radius: 14px; padding: 16px;
+  transition: transform .18s, box-shadow .18s;
+}
+.gf:hover { transform: translateY(-3px); box-shadow: 0 8px 22px rgba(15,32,68,.08); }
+.gf-icon  { width: 44px; height: 44px; border-radius: 12px; background: var(--off); display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
+.gf-title { font-size: 13px; font-weight: 800; color: var(--td); margin-bottom: 3px; }
+.gf-desc  { font-size: 11px; color: var(--tm); line-height: 1.55; }
+.game-card {
+  background: linear-gradient(145deg, var(--navy2) 0%, #1E3A6E 100%);
+  border-radius: 26px; padding: 22px;
+  border: 1px solid rgba(255,255,255,.07);
+  box-shadow: 0 20px 70px rgba(10,22,40,.28);
+}
+.wgoal {
+  background: linear-gradient(135deg, #FFFBEB, #FEF3C7);
+  border-radius: 16px; padding: 14px;
+  display: flex; align-items: center; gap: 11px; margin-bottom: 11px;
+}
+.wg-trophy { font-size: 26px; }
+.wg-t { font-size: 12px; font-weight: 800; color: #92400E; }
+.wg-s { font-size: 10px; color: #B45309; }
+.wg-ring-wrap { margin-left: auto; position: relative; width: 48px; height: 48px; }
+.wg-ring-wrap svg { transform: rotate(-90deg); }
+.wg-pct { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 900; color: #B45309; }
+.badge-row { display: flex; gap: 7px; margin-bottom: 11px; }
+.bdg { flex: 1; background: rgba(255,255,255,.06); border-radius: 11px; padding: 11px 6px; text-align: center; border: 1px solid rgba(255,255,255,.06); }
+.bdg-em { font-size: 20px; }
+.bdg-nm { font-size: 8px; font-weight: 700; color: rgba(255,255,255,.60); margin-top: 3px; }
+.streak {
+  background: rgba(245,158,11,.10); border: 1px solid rgba(245,158,11,.20);
+  border-radius: 13px; padding: 13px;
+  display: flex; align-items: center; gap: 11px;
+}
+.streak-t { font-size: 14px; font-weight: 900; color: var(--amber); }
+.streak-s { font-size: 10px; color: rgba(245,158,11,.75); }
+.new-grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(244px,1fr)); gap: 14px; margin-top: 44px; }
+.nf {
+  background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08);
+  border-radius: 18px; padding: 22px;
+  transition: transform .2s, border-color .2s;
+}
+.nf:hover { transform: translateY(-4px); border-color: rgba(0,196,180,.28); }
+.nf-tag { display: inline-block; font-size: 9px; font-weight: 800; padding: 3px 9px; border-radius: 999px; margin-bottom: 12px; letter-spacing: .07em; text-transform: uppercase; }
+.t-auto{ background: rgba(0,196,180,.14); color: var(--mint2); }
+.t-sel { background: rgba(245,158,11,.14); color: var(--amber); }
+.t-ai  { background: rgba(124,92,252,.14); color: #A78BFA; }
+.nf-icon  { font-size: 36px; margin-bottom: 12px; }
+.nf-title { font-size: 16px; font-weight: 900; color: #fff; margin-bottom: 7px; letter-spacing: -.02em; }
+.nf-desc  { font-size: 12px; color: rgba(255,255,255,.58); line-height: 1.68; }
+.nf-cite  { font-size: 9px; color: rgba(255,255,255,.28); margin-top: 11px; font-style: italic; }
+.nf-mets  { display: flex; gap: 7px; margin-top: 12px; }
+.nfm { flex: 1; background: rgba(255,255,255,.05); border-radius: 9px; padding: 8px 6px; text-align: center; }
+.nfm-l { font-size: 8px; font-weight: 700; color: rgba(255,255,255,.42); text-transform: uppercase; }
+.nfm-v { font-size: 14px; font-weight: 900; color: #fff; }
+.nfm-r { font-size: 8px; color: rgba(255,255,255,.32); }
+.tech-grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(195px,1fr)); gap: 12px; margin-top: 42px; }
+.titem {
+  background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08);
+  border-radius: 15px; padding: 18px; text-align: center;
+  transition: border-color .2s, background .2s;
+}
+.titem:hover { border-color: rgba(0,196,180,.28); background: rgba(0,196,180,.05); }
+.titem-ico  { font-size: 28px; margin-bottom: 8px; }
+.titem-name { font-size: 12px; font-weight: 800; color: #fff; margin-bottom: 4px; }
+.titem-desc { font-size: 10px; color: rgba(255,255,255,.48); line-height: 1.55; }
+.titem-badge{ margin-top: 7px; display: inline-block; font-size: 8px; font-weight: 700; color: var(--mint); background: rgba(0,196,180,.10); padding: 2px 7px; border-radius: 999px; }
+.disclaimer-box {
+  background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.08);
+  border-radius: 14px; padding: 16px 18px; margin-top: 40px;
+  display: flex; gap: 11px; align-items: flex-start;
+}
+.dsc-ico  { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+.dsc-text { font-size: 11px; color: rgba(255,255,255,.42); line-height: 1.72; }
+.dsc-text strong { color: rgba(255,255,255,.62); }
+.cmp-wrap { overflow-x: auto; margin-top: 42px; }
+.cmp-tbl  { width: 100%; border-collapse: collapse; min-width: 520px; }
+.cmp-tbl th {
+  padding: 13px 14px; font-size: 11px; font-weight: 800; text-align: center;
+  letter-spacing: .04em; background: rgba(255,255,255,.04);
+  border-bottom: 1px solid rgba(255,255,255,.08);
+}
+.cmp-tbl th.ours { color: var(--mint); background: rgba(0,196,180,.07); }
+.cmp-tbl th:first-child { text-align: left; }
+.cmp-tbl td {
+  padding: 12px 14px; font-size: 12px; border-bottom: 1px solid rgba(255,255,255,.05);
+  text-align: center; color: rgba(255,255,255,.62);
+}
+.cmp-tbl td:first-child { text-align: left; font-weight: 600; color: rgba(255,255,255,.82); }
+.cmp-tbl td.ours { background: rgba(0,196,180,.04); }
+.ck  { color: var(--mint);  font-size: 15px; }
+.xx  { color: rgba(255,255,255,.22); font-size: 13px; }
+.pt  { color: var(--amber); font-size: 11px; }
+.testi-grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(255px,1fr)); gap: 14px; margin-top: 42px; }
+.tcard {
+  background: #fff; border: 1px solid #E2E8F0; border-radius: 18px; padding: 22px;
+  box-shadow: 0 2px 14px rgba(15,32,68,.05);
+}
+.tcard-stars { color: var(--amber); font-size: 13px; margin-bottom: 11px; }
+.tcard-text  { font-size: 12px; color: var(--tm); line-height: 1.72; margin-bottom: 14px; font-style: italic; }
+.tcard-who   { display: flex; align-items: center; gap: 9px; }
+.tcard-avatar{ width: 36px; height: 36px; border-radius: 50%; background: var(--navy2); display: flex; align-items: center; justify-content: center; font-size: 15px; flex-shrink: 0; }
+.tcard-name  { font-size: 12px; font-weight: 800; color: var(--td); }
+.tcard-role  { font-size: 10px; color: var(--ts); }
+.cta-sec {
+  background: var(--navy); padding: clamp(56px,10vw,96px) clamp(16px,5vw,60px);
+  text-align: center; position: relative; overflow: hidden;
+}
+.cta-glow { position: absolute; inset: 0; background: radial-gradient(ellipse at center, rgba(0,196,180,.10) 0%, transparent 68%); pointer-events: none; }
+.cta-h { font-size: clamp(28px,5vw,52px); font-weight: 900; color: #fff; letter-spacing: -.035em; line-height: 1.12; margin-bottom: 14px; position: relative; z-index: 1; }
+.cta-h .a { color: var(--mint); }
+.cta-sub { font-size: clamp(13px,1.6vw,16px); color: rgba(255,255,255,.58); max-width: 500px; margin: 0 auto 32px; line-height: 1.72; position: relative; z-index: 1; }
+.cta-btns { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; position: relative; z-index: 1; }
+.cta-note { margin-top: 14px; font-size: 11px; color: rgba(255,255,255,.32); position: relative; z-index: 1; }
+footer {
+  background: var(--navy); border-top: 1px solid rgba(255,255,255,.06);
+  padding: 30px clamp(16px,5vw,60px);
+  display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;
+}
+.ft-logo { display: flex; align-items: center; gap: 8px; text-decoration: none; }
+.ft-mark { width: 26px; height: 26px; border-radius: 7px; background: var(--mint); display: flex; align-items: center; justify-content: center; font-size: 13px; }
+.ft-name { font-size: 14px; font-weight: 900; color: rgba(255,255,255,.75); }
+.ft-copy { font-size: 10px; color: rgba(255,255,255,.28); }
+.ft-links { display: flex; gap: 18px; }
+.ft-link { font-size: 10px; color: rgba(255,255,255,.36); text-decoration: none; }
+.ft-link:hover { color: var(--mint); }
+@media(max-width:600px){ footer { flex-direction: column; text-align: center; align-items: center; } }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">Young<span>Button</span></div>
+  <ul class="nav-links">
+    <li><a href="#features">기능</a></li>
+    <li><a href="#ai">AI 기술</a></li>
+    <li><a href="#howto">사용법</a></li>
+    <li><a href="#metrics">측정 지표</a></li>
+  </ul>
+  <a href="https://young-button.vercel.app/" class="nav-cta" target="_blank">지금 시작하기 →</a>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-bg-text">HEALTH</div>
+
+  <div class="hero-left reveal">
+    <div class="hero-eyebrow">무료 · 설치 불필요 · PWA</div>
+    <h1 class="hero-h1">스마트폰<br>카메라 하나로<br><em>내 몸을 읽다</em></h1>
+    <div class="hero-sub-h1">심박 · 혈관 · 감정 · 자율신경</div>
+    <p class="hero-desc">
+      특별한 기기 없어도 스마트폰만으로.<br>
+      얼굴이나 손가락을 카메라에 비추기만 하면<br>
+      <strong>ME-rPPG 딥러닝 AI</strong>가 10초 만에<br>
+      심박수·HRV·혈관 나이·부정맥 리스크를 분석합니다.<br>
+    </p>
+    <div class="hero-actions">
+      <a href="https://young-button.vercel.app/" class="btn-primary" target="_blank">
+        <span>📱</span> 무료로 측정하기
+      </a>
+      <a href="#features" class="btn-secondary">기능 살펴보기</a>
+    </div>
+    <div class="hero-stats">
+      <div>
+        <div class="hero-stat-num">10+</div>
+        <div class="hero-stat-label">측정 항목</div>
+      </div>
+      <div>
+        <div class="hero-stat-num">3</div>
+        <div class="hero-stat-label">측정 방법</div>
+      </div>
+      <div>
+        <div class="hero-stat-num">0원</div>
+        <div class="hero-stat-label">별도 기기 비용</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="hero-right reveal reveal-delay-2">
+    <div class="phone-mockup">
+      <div class="phone-notch"></div>
+      <div class="phone-screen">
+        <div class="phone-header">
+          <div class="phone-header-title">건강 측정 결과</div>
+          <div class="phone-score-ring">
+            <div class="phone-score-num">82</div>
+          </div>
+          <div class="phone-score-label">정신·신체 회복력 점수</div>
+        </div>
+        <div class="phone-metrics">
+          <div class="phone-metric">
+            <div class="pm-val" style="color:#22c55e">68</div>
+            <div class="pm-unit">BPM</div>
+            <div class="pm-lbl">심박수</div>
+          </div>
+          <div class="phone-metric">
+            <div class="pm-val" style="color:#818cf8">42</div>
+            <div class="pm-unit">ms</div>
+            <div class="pm-lbl">HRV</div>
+          </div>
+          <div class="phone-metric">
+            <div class="pm-val" style="color:#34d399">15</div>
+            <div class="pm-unit">회/분</div>
+            <div class="pm-lbl">호흡수</div>
+          </div>
+        </div>
+        <div class="phone-cards">
+          <div class="phone-card">
+            <div class="pc-icon">🫀</div>
+            <div>
+              <div class="pc-label">혈관 나이 추정</div>
+              <div class="pc-val">43세 추정</div>
+            </div>
+            <div class="pc-badge good">정상</div>
+          </div>
+          <div class="phone-card">
+            <div class="pc-icon">💓</div>
+            <div>
+              <div class="pc-label">부정맥 리스크</div>
+              <div class="pc-val">낮음 · 정상 리듬</div>
+            </div>
+            <div class="pc-badge good">💚</div>
+          </div>
+          <div class="phone-card">
+            <div class="pc-icon">🌬️</div>
+            <div>
+              <div class="pc-label">미주신경 활성도</div>
+              <div class="pc-val">RSA 68/100</div>
+            </div>
+            <div class="pc-badge good">양호</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- STATS STRIP -->
+<div class="stats-strip">
+  <div class="stats-inner">
+    <div class="stat-big rv"><div class="stat-big-num" data-cnt="30" data-sfx="초">30초</div><div class="stat-big-lbl">평균 측정 시간</div></div>
+    <div class="stat-big rv d1"><div class="stat-big-num" data-cnt="24" data-sfx="개">24개</div><div class="stat-big-lbl">학술 기반 지표</div></div>
+    <div class="stat-big rv d2"><div class="stat-big-num" data-cnt="0" data-sfx="원">0원</div><div class="stat-big-lbl">추가 기기 비용</div></div>
+    <div class="stat-big rv d3"><div class="stat-big-num" data-cnt="9" data-sfx="종">9종</div><div class="stat-big-lbl">건강 측정 항목</div></div>
+  </div>
+</div>
+
+<!-- TRUST BAR -->
+<div class="trust-bar">
+  <div class="trust-item">
+    <div class="trust-icon">🏥</div>
+    <div class="trust-text">임상 등급 알고리즘</div>
+  </div>
+  <div class="trust-item">
+    <div class="trust-icon">🧠</div>
+    <div class="trust-text">ME-rPPG 딥러닝 AI</div>
+  </div>
+  <div class="trust-item">
+    <div class="trust-icon">📱</div>
+    <div class="trust-text">카메라만으로 측정</div>
+  </div>
+  <div class="trust-item">
+    <div class="trust-icon">🔒</div>
+    <div class="trust-text">데이터 기기 내 저장</div>
+  </div>
+  <div class="trust-item">
+    <div class="trust-icon">⚡</div>
+    <div class="trust-text">10초 즉각 결과</div>
+  </div>
+</div>
+
+<!-- WHY 섹션 -->
+<section>
+  <div class="eyebrow reveal">왜 YoungButton인가</div>
+  <h2 class="section-title reveal reveal-delay-1">기존과 다른<br>3가지 이유</h2>
+  <div class="why-grid">
+    <div class="why-card reveal">
+      <div class="why-number">01</div>
+      <div class="why-icon">🤖</div>
+      <div class="why-title">내장형 ME-rPPG AI 엔진</div>
+      <div class="why-desc">ME-rPPG State Space Duality 신경망이 RGB 영상에서 직접 PPG 신호를 추출합니다. 애플워치나 갤럭시워치 없이도 임상급 HRV 분석이 가능합니다.</div>
+    </div>
+    <div class="why-card reveal reveal-delay-1">
+      <div class="why-number">02</div>
+      <div class="why-icon">🔬</div>
+      <div class="why-title">혈관 나이 · 부정맥까지</div>
+      <div class="why-desc">심박수·HRV에서 그치지 않습니다. PPG 파형 분석으로 혈관 탄성도(AIx), 포앵카레 플롯 기반 부정맥 리스크, RSA 미주신경 활성도를 동시에 제공합니다.</div>
+    </div>
+    <div class="why-card reveal reveal-delay-2">
+      <div class="why-number">03</div>
+      <div class="why-icon">💝</div>
+      <div class="why-title">가족 안부 공유</div>
+      <div class="why-desc">측정 결과를 링크 하나로 공유하세요. 부모님·자녀·친구에게 오늘 내 건강 상태를 전달하고, 서로의 변화를 함께 추적할 수 있습니다.</div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES 섹션 -->
+<section id="features" style="padding-top:40px">
+  <div class="eyebrow reveal">주요 기능</div>
+  <h2 class="section-title reveal reveal-delay-1">하나의 앱에<br>담긴 모든 측정</h2>
+  <p class="section-desc reveal reveal-delay-2">얼굴 카메라, 손가락 PPG, 신체 센서, 감정 게임까지. 병원 가지 않고 스마트폰으로 할 수 있는 건강 측정을 통합했습니다.</p>
+
+  <div class="features-list">
+
+    <!-- 1. 얼굴 측정 -->
+    <div class="feature-row reveal">
+      <div>
+        <div class="feature-label" style="background:rgba(61,82,213,.1);color:#3d52d5">😊 얼굴 측정</div>
+        <h3 class="feature-title">카메라로<br>얼굴을 보기만 해도</h3>
+        <p class="feature-desc">전면 카메라에 얼굴을 비추면 ME-rPPG AI가 피부 색상 변화에서 심혈관 신호를 추출합니다. 별도 기기 없이 임상급 측정이 가능합니다.</p>
+        <ul class="feature-points">
+          <li>심박수(HR) · 심박변이도(HRV/RMSSD) 실시간 측정</li>
+          <li>자율신경 스트레스 지수 (Baevsky SI)</li>
+          <li><strong>혈관 나이 추정</strong> — PPG 파형 분석 (AIx 기반)</li>
+          <li><strong>부정맥 조기 감지</strong> — Poincaré 플롯 SD1/SD2</li>
+          <li><strong>RSA 미주신경 활성도</strong> — 자율신경 건강 지표</li>
+        </ul>
+      </div>
+      <div class="feature-visual fv-face">
+        <div class="fv-inner">
+          <div class="fv-face-ring"></div>
+          <div class="fv-metrics-row">
+            <div class="fv-metric-chip">
+              <div class="fvc-val" style="color:#22c55e">68</div>
+              <div class="fvc-lbl">HR · BPM</div>
+              <div class="fvc-grade grade-g">정상</div>
+            </div>
+            <div class="fv-metric-chip">
+              <div class="fvc-val" style="color:#818cf8">42</div>
+              <div class="fvc-lbl">RMSSD · ms</div>
+              <div class="fvc-grade grade-g">양호</div>
+            </div>
+            <div class="fv-metric-chip">
+              <div class="fvc-val" style="color:#f59e0b">120</div>
+              <div class="fvc-lbl">스트레스 SI</div>
+              <div class="fvc-grade grade-w">보통</div>
+            </div>
+          </div>
+          <div class="fv-adv-cards">
+            <div class="fv-adv-card">
+              <div class="fac-icon">🫀</div>
+              <div class="fac-title">혈관 나이</div>
+              <div class="fac-val" style="color:#f472b6">43세</div>
+            </div>
+            <div class="fv-adv-card">
+              <div class="fac-icon">💓</div>
+              <div class="fac-title">부정맥 리스크</div>
+              <div class="fac-val" style="color:#22c55e">낮음</div>
+            </div>
+            <div class="fv-adv-card">
+              <div class="fac-icon">🌬️</div>
+              <div class="fac-title">RSA 지수</div>
+              <div class="fac-val" style="color:#34d399">68/100</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. 손가락 측정 -->
+    <div class="feature-row reverse reveal">
+      <div>
+        <div class="feature-label" style="background:rgba(240,84,84,.1);color:#f05454">☝️ 손가락 측정</div>
+        <h3 class="feature-title">임상급 정밀도<br>손가락 PPG</h3>
+        <p class="feature-desc">후면 카메라 렌즈에 손가락을 올리면 적혈구 흡광 변화를 직접 측정합니다. 얼굴 측정보다 10배 높은 SNR로 더욱 정확한 HRV를 얻을 수 있습니다.</p>
+        <ul class="feature-points">
+          <li>RMSSD · SDNN · pNN50 고정밀 측정</li>
+          <li>AI 신호 보정 + G채널 자동 전환 (외부조명 환경)</li>
+          <li>신호 품질 실시간 표시 · 신뢰도 등급</li>
+          <li>포앵카레 플롯 기반 부정맥 리스크 분석</li>
+          <li>얼굴 측정과 가중평균 통합 — 더 높은 신뢰도</li>
+        </ul>
+      </div>
+      <div class="feature-visual fv-finger">
+        <div class="fv-inner">
+          <div class="fv-finger-anim">
+            <div class="fv-pulse-ring"></div>
+            <div class="fv-pulse-ring"></div>
+            <div class="fv-pulse-ring"></div>
+            <div class="fv-finger-icon">☝️</div>
+          </div>
+          <div class="fv-waveform">
+            <svg viewBox="0 0 400 40" fill="none">
+              <path d="M0,20 Q20,20 30,20 Q35,20 40,5 Q45,-5 50,20 Q55,35 60,20 Q70,20 80,20
+                       Q100,20 110,20 Q115,20 120,5 Q125,-5 130,20 Q135,35 140,20 Q150,20 160,20
+                       Q180,20 190,20 Q195,20 200,5 Q205,-5 210,20 Q215,35 220,20 Q230,20 240,20
+                       Q260,20 270,20 Q275,20 280,5 Q285,-5 290,20 Q295,35 300,20 Q310,20 320,20
+                       Q340,20 350,20 Q355,20 360,5 Q365,-5 370,20 Q375,35 380,20 Q390,20 400,20"
+                stroke="#ef4444" stroke-width="2" fill="none" opacity=".8"/>
+            </svg>
+          </div>
+          <div class="fv-metrics-row">
+            <div class="fv-metric-chip">
+              <div class="fvc-val" style="color:#ef4444">72</div>
+              <div class="fvc-lbl">HR · BPM</div>
+            </div>
+            <div class="fv-metric-chip">
+              <div class="fvc-val" style="color:#f472b6">38</div>
+              <div class="fvc-lbl">RMSSD · ms</div>
+            </div>
+            <div class="fv-metric-chip">
+              <div class="fvc-val" style="color:#fb923c">52</div>
+              <div class="fvc-lbl">SDNN · ms</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. 신체 측정 -->
+    <div class="feature-row reveal">
+      <div>
+        <div class="feature-label" style="background:rgba(14,165,160,.1);color:#0ea5a0">🏃 신체 측정</div>
+        <h3 class="feature-title">스마트폰 센서로<br>몸 상태 점검</h3>
+        <p class="feature-desc">가속도계·자이로스코프를 활용해 병원에서만 가능했던 신체 기능 검사를 집에서 실시합니다. 노인 낙상 위험도 예측에도 활용됩니다.</p>
+        <ul class="feature-points">
+          <li>균형 검사 — 눈 뜨고/감기 흔들림 분석</li>
+          <li>보행 분석 — 걸음수 · 케이던스 · 대칭성</li>
+          <li>반응속도 검사 — 신경 전도 민첩성</li>
+          <li>손떨림 측정 — 진폭 · 주파수 분석</li>
+          <li>자세 평가 — 어깨·머리 정렬 분석</li>
+          <li>신체 지수 — BMI · WHtR · ABSI · 신체 나이</li>
+        </ul>
+      </div>
+      <div class="feature-visual fv-body">
+        <div class="fv-inner">
+          <div class="fv-body-grid">
+            <div class="fv-body-item">
+              <div class="fbi-icon">⚖️</div>
+              <div>
+                <div class="fbi-name">균형 검사</div>
+                <div class="fbi-score">87점</div>
+              </div>
+            </div>
+            <div class="fv-body-item">
+              <div class="fbi-icon">🚶</div>
+              <div>
+                <div class="fbi-name">보행 분석</div>
+                <div class="fbi-score">91점</div>
+              </div>
+            </div>
+            <div class="fv-body-item">
+              <div class="fbi-icon">⚡</div>
+              <div>
+                <div class="fbi-name">반응속도</div>
+                <div class="fbi-score" style="color:#f59e0b">73점</div>
+              </div>
+            </div>
+            <div class="fv-body-item">
+              <div class="fbi-icon">✋</div>
+              <div>
+                <div class="fbi-name">손떨림</div>
+                <div class="fbi-score">88점</div>
+              </div>
+            </div>
+            <div class="fv-body-item">
+              <div class="fbi-icon">🧍</div>
+              <div>
+                <div class="fbi-name">자세 평가</div>
+                <div class="fbi-score" style="color:#f59e0b">79점</div>
+              </div>
+            </div>
+            <div class="fv-body-item">
+              <div class="fbi-icon">📐</div>
+              <div>
+                <div class="fbi-name">신체 지수</div>
+                <div class="fbi-score">82점</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. 감정 & 정신건강 -->
+    <div class="feature-row reverse reveal">
+      <div>
+        <div class="feature-label" style="background:rgba(139,92,246,.1);color:#7c3aed">🎭 감정 & 정신건강</div>
+        <h3 class="feature-title">게임처럼<br>감정을 측정</h3>
+        <p class="feature-desc">PANAS · Russell 감정 순환 모델 · Plutchik 감정 바퀴 · Ekman 6대 기본 감정. 학술 검증된 4가지 심리 도구를 인터랙티브 게임 형식으로 제공합니다.</p>
+        <ul class="feature-points">
+          <li>PANAS 긍정·부정 정서 척도 (Watson & Clark 1988)</li>
+          <li>감정 캐릭터 선택 — 표정 미러링 게임</li>
+          <li>자율신경(HRV) + 감정 통합 정신건강 점수</li>
+          <li>회복탄력성 · 사회적 연결감 · 마음챙김 지수</li>
+          <li>위기 상황 감지 시 전문기관 연결 안내</li>
+        </ul>
+      </div>
+      <div class="feature-visual fv-mood">
+        <div class="fv-inner">
+          <div class="fv-emotion-cards">
+            <div class="fv-em-card selected">
+              <div class="fv-em-icon">😊</div>
+              <div class="fv-em-name">기쁨</div>
+            </div>
+            <div class="fv-em-card">
+              <div class="fv-em-icon">😌</div>
+              <div class="fv-em-name">평온</div>
+            </div>
+            <div class="fv-em-card">
+              <div class="fv-em-icon">😟</div>
+              <div class="fv-em-name">걱정</div>
+            </div>
+            <div class="fv-em-card">
+              <div class="fv-em-icon">😤</div>
+              <div class="fv-em-name">짜증</div>
+            </div>
+            <div class="fv-em-card">
+              <div class="fv-em-icon">😔</div>
+              <div class="fv-em-name">슬픔</div>
+            </div>
+            <div class="fv-em-card">
+              <div class="fv-em-icon">😴</div>
+              <div class="fv-em-name">피로</div>
+            </div>
+          </div>
+          <div class="fv-mental-score">
+            <div class="fms-label">정신건강 종합 점수</div>
+            <div class="fms-val">74</div>
+            <div class="fms-sub">회복탄력성 · 연결감 · 마음챙김 통합</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5. 안부 공유 -->
+    <div class="feature-row reveal">
+      <div>
+        <div class="feature-label" style="background:rgba(201,168,76,.1);color:#c9a84c">💌 안부 공유</div>
+        <h3 class="feature-title">건강으로<br>안부를 전하다</h3>
+        <p class="feature-desc">측정 결과를 링크 하나로 카카오톡·문자로 공유하세요. 부모님이 오늘 얼마나 건강한지, 자녀에게 걱정을 덜어드릴 수 있습니다.</p>
+        <ul class="feature-points">
+          <li>링크 공유 — 앱 설치 없이 결과 확인</li>
+          <li>관계별 맞춤 메시지 (부모 · 자녀 · 친구 · 연인)</li>
+          <li>측정 날짜·점수·핵심 지표 카드 형태 전송</li>
+          <li>수신자도 바로 측정 시작 가능</li>
+        </ul>
+      </div>
+      <div class="feature-visual fv-share">
+        <div class="fv-inner">
+          <div class="fv-share-card">
+            <div class="fsc-header">
+              <div class="fsc-avatar">👵</div>
+              <div>
+                <div class="fsc-name">어머니의 오늘 건강</div>
+                <div class="fsc-sub">방금 전 측정 완료</div>
+              </div>
+            </div>
+            <div style="text-align:center;margin:8px 0">
+              <div style="font-family:'Bebas Neue',sans-serif;font-size:2.8rem;color:#22c55e;line-height:1">78<span style="font-size:1rem;color:rgba(255,255,255,.4)">/100</span></div>
+              <div style="font-size:9px;color:rgba(255,255,255,.35);margin-top:2px">정신·신체 회복력 점수</div>
+            </div>
+            <div class="fsc-metrics">
+              <div class="fsc-metric">
+                <div class="fscm-val">71 BPM</div>
+                <div class="fscm-lbl">심박수</div>
+              </div>
+              <div class="fsc-metric">
+                <div class="fscm-val">36 ms</div>
+                <div class="fscm-lbl">HRV</div>
+              </div>
+              <div class="fsc-metric">
+                <div class="fscm-val">이완</div>
+                <div class="fscm-lbl">스트레스</div>
+              </div>
+            </div>
+            <div class="fsc-msg">"오늘도 건강합니다 😊 걱정 마세요!"</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ME-rPPG AI 섹션 -->
+<div class="ai-section section-full" id="ai">
+  <div class="ai-inner">
+    <div class="eyebrow reveal">핵심 기술</div>
+    <h2 class="section-title reveal reveal-delay-1">ME-rPPG<br>딥러닝 엔진</h2>
+    <p class="section-desc reveal reveal-delay-2">
+      State Space Duality 아키텍처 기반 신경망이 카메라 RGB 영상에서<br>
+      직접 PPG 신호를 추출합니다. 단순 얼굴 측정 도구가 아닌<br>
+      범용 광혈류 신호 추출 엔진입니다.
+    </p>
+    <div class="ai-grid">
+      <div class="ai-card reveal">
+        <div class="ai-card-icon">🧬</div>
+        <div class="ai-card-title">혈관 나이 추정</div>
+        <div class="ai-card-desc">PPG 파형 앙상블 평균화 → 수축기 피크 타이밍, 딕로틱 노치 분석 → 혈관 증강 지수(AIx) 계산</div>
+        <div class="ai-card-badge">Millasseau 2002</div>
+      </div>
+      <div class="ai-card reveal reveal-delay-1">
+        <div class="ai-card-icon">💓</div>
+        <div class="ai-card-title">부정맥 조기 감지</div>
+        <div class="ai-card-desc">Poincaré 플롯 SD1/SD2 분석, 연속 리듬 점프 패턴 감지, 불규칙성 지수 다중 앙상블</div>
+        <div class="ai-card-badge">Brennan 2001</div>
+      </div>
+      <div class="ai-card reveal reveal-delay-2">
+        <div class="ai-card-icon">🌬️</div>
+        <div class="ai-card-title">RSA 미주신경</div>
+        <div class="ai-card-desc">RR 간격 HF 파워 분석, 호흡 주파수 대역 크로스밸리데이션, 자율신경 부교감 건강 지표</div>
+        <div class="ai-card-badge">Grossman 2007</div>
+      </div>
+      <div class="ai-card reveal reveal-delay-3">
+        <div class="ai-card-icon">📈</div>
+        <div class="ai-card-title">HRV 정밀 분석</div>
+        <div class="ai-card-desc">적응형 피크 감지, 이소박동 제거, Berntson 1997 자율신경 균형 지표, RMSSD 편향 보정</div>
+        <div class="ai-card-badge">Task Force 1996</div>
+      </div>
+    </div>
+    <div class="ai-evidence reveal">
+      <div class="ai-evidence-label">학술 근거</div>
+      <div class="ai-evidence-items">
+        <div class="ae-chip">PANAS — Watson & Clark 1988 (α=0.89)</div>
+        <div class="ae-chip">Baevsky Stress Index 1997</div>
+        <div class="ae-chip">Russell Circumplex 1980</div>
+        <div class="ae-chip">Plutchik Wheel 1980</div>
+        <div class="ae-chip">Ekman 6 Basic Emotions 1992</div>
+        <div class="ae-chip">Verkruysse G채널 2008</div>
+        <div class="ae-chip">Allagi 2022 — 손가락 SNR 10배</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- HOW IT WORKS -->
+<section id="howto">
+  <div class="eyebrow reveal">사용법</div>
+  <h2 class="section-title reveal reveal-delay-1">4단계면<br>충분합니다</h2>
+  <p class="section-desc reveal reveal-delay-2">설치도, 로그인도 필요 없습니다. 브라우저에서 바로 시작하세요.</p>
+  <div class="how-steps">
+    <div class="how-step reveal">
+      <div class="how-step-num">1</div>
+      <div class="how-step-icon">📱</div>
+      <div class="how-step-title">사이트 접속</div>
+      <div class="how-step-desc">young-button.vercel.app 접속. 설치 없이 바로 사용 가능. PWA로 홈 화면 추가 시 앱처럼 실행됩니다.</div>
+    </div>
+    <div class="how-step reveal reveal-delay-1">
+      <div class="how-step-num">2</div>
+      <div class="how-step-icon">👤</div>
+      <div class="how-step-title">나이·성별 입력</div>
+      <div class="how-step-desc">또래 평균 대비 분석을 위해 나이와 성별만 입력합니다. 별도 계정이나 개인정보 등록 불필요.</div>
+    </div>
+    <div class="how-step reveal reveal-delay-2">
+      <div class="how-step-num">3</div>
+      <div class="how-step-icon">🎯</div>
+      <div class="how-step-title">측정 시작</div>
+      <div class="how-step-desc">얼굴 / 손가락 / 신체 중 원하는 측정을 선택. 카메라 허용 후 30초만 유지하면 완료.</div>
+    </div>
+    <div class="how-step reveal reveal-delay-3">
+      <div class="how-step-num">4</div>
+      <div class="how-step-icon">📊</div>
+      <div class="how-step-title">결과 확인 & 공유</div>
+      <div class="how-step-desc">점수·등급·맞춤 해석 즉시 표시. 링크로 가족에게 안부 공유, 트렌드 페이지에서 변화 추이 확인.</div>
+    </div>
+  </div>
+</section>
+
+<!-- METRICS 전체 지표 -->
+<div class="metrics-bg section-full" id="metrics">
+  <div class="metrics-inner">
+    <div class="eyebrow reveal">측정 지표 전체 목록</div>
+    <h2 class="section-title reveal reveal-delay-1">측정 가능한<br>모든 지표</h2>
+    <div class="metrics-grid">
+
+      <div class="metric-group reveal">
+        <div class="mg-header face">
+          <div class="mg-icon">😊</div>
+          <div class="mg-title">얼굴 측정 (ME-rPPG)</div>
+        </div>
+        <div class="mg-items">
+          <div class="mg-item"><span class="mg-item-name">심박수 (HR)</span><span class="mg-item-badge badge-std">BPM</span></div>
+          <div class="mg-item"><span class="mg-item-name">HRV · RMSSD</span><span class="mg-item-badge badge-std">ms</span></div>
+          <div class="mg-item"><span class="mg-item-name">SDNN</span><span class="mg-item-badge badge-std">ms</span></div>
+          <div class="mg-item"><span class="mg-item-name">호흡수</span><span class="mg-item-badge badge-std">회/분</span></div>
+          <div class="mg-item"><span class="mg-item-name">스트레스 지수 (Baevsky)</span><span class="mg-item-badge badge-ai">AI 분석</span></div>
+          <div class="mg-item"><span class="mg-item-name">🆕 혈관 나이 추정</span><span class="mg-item-badge badge-new">신규</span></div>
+          <div class="mg-item"><span class="mg-item-name">🆕 부정맥 리스크</span><span class="mg-item-badge badge-new">신규</span></div>
+          <div class="mg-item"><span class="mg-item-name">🆕 RSA 미주신경 지수</span><span class="mg-item-badge badge-new">신규</span></div>
+        </div>
+      </div>
+
+      <div class="metric-group reveal reveal-delay-1">
+        <div class="mg-header finger">
+          <div class="mg-icon">☝️</div>
+          <div class="mg-title">손가락 측정 (임상급)</div>
+        </div>
+        <div class="mg-items">
+          <div class="mg-item"><span class="mg-item-name">심박수 (HR)</span><span class="mg-item-badge badge-std">BPM</span></div>
+          <div class="mg-item"><span class="mg-item-name">RMSSD</span><span class="mg-item-badge badge-std">ms</span></div>
+          <div class="mg-item"><span class="mg-item-name">SDNN</span><span class="mg-item-badge badge-std">ms</span></div>
+          <div class="mg-item"><span class="mg-item-name">pNN50</span><span class="mg-item-badge badge-std">%</span></div>
+          <div class="mg-item"><span class="mg-item-name">스트레스 지수 (Baevsky)</span><span class="mg-item-badge badge-ai">AI 분석</span></div>
+          <div class="mg-item"><span class="mg-item-name">자율신경 톤 (5단계)</span><span class="mg-item-badge badge-std">단계</span></div>
+          <div class="mg-item"><span class="mg-item-name">🆕 부정맥 리스크 SD1/SD2</span><span class="mg-item-badge badge-new">신규</span></div>
+          <div class="mg-item"><span class="mg-item-name">얼굴 통합 가중평균</span><span class="mg-item-badge badge-ai">통합</span></div>
+        </div>
+      </div>
+
+      <div class="metric-group reveal reveal-delay-2">
+        <div class="mg-header body">
+          <div class="mg-icon">🏃</div>
+          <div class="mg-title">신체 측정 (센서)</div>
+        </div>
+        <div class="mg-items">
+          <div class="mg-item"><span class="mg-item-name">균형 점수 (눈뜨고/감기)</span><span class="mg-item-badge badge-std">점</span></div>
+          <div class="mg-item"><span class="mg-item-name">보행 케이던스 · 대칭성</span><span class="mg-item-badge badge-std">점</span></div>
+          <div class="mg-item"><span class="mg-item-name">반응속도</span><span class="mg-item-badge badge-std">ms</span></div>
+          <div class="mg-item"><span class="mg-item-name">손떨림 진폭·주파수</span><span class="mg-item-badge badge-std">점</span></div>
+          <div class="mg-item"><span class="mg-item-name">자세 정렬 (어깨·머리)</span><span class="mg-item-badge badge-std">점</span></div>
+          <div class="mg-item"><span class="mg-item-name">BMI · WHtR · ABSI</span><span class="mg-item-badge badge-std">지수</span></div>
+          <div class="mg-item"><span class="mg-item-name">신체 나이 추정</span><span class="mg-item-badge badge-ai">AI 계산</span></div>
+          <div class="mg-item"><span class="mg-item-name">피부 나이 추정</span><span class="mg-item-badge badge-ai">참고용</span></div>
+        </div>
+      </div>
+
+      <div class="metric-group reveal">
+        <div class="mg-header mood">
+          <div class="mg-icon">🎭</div>
+          <div class="mg-title">감정 & 정신건강</div>
+        </div>
+        <div class="mg-items">
+          <div class="mg-item"><span class="mg-item-name">정신건강 종합 점수</span><span class="mg-item-badge badge-std">점</span></div>
+          <div class="mg-item"><span class="mg-item-name">PANAS 긍정·부정 정서</span><span class="mg-item-badge badge-std">척도</span></div>
+          <div class="mg-item"><span class="mg-item-name">감정 유형 (Russell 2D)</span><span class="mg-item-badge badge-ai">분석</span></div>
+          <div class="mg-item"><span class="mg-item-name">회복탄력성 지수</span><span class="mg-item-badge badge-std">점</span></div>
+          <div class="mg-item"><span class="mg-item-name">사회적 연결감</span><span class="mg-item-badge badge-std">점</span></div>
+          <div class="mg-item"><span class="mg-item-name">마음챙김 지수</span><span class="mg-item-badge badge-std">점</span></div>
+        </div>
+      </div>
+
+      <div class="metric-group reveal reveal-delay-1">
+        <div class="mg-header share">
+          <div class="mg-icon">💌</div>
+          <div class="mg-title">안부 공유</div>
+        </div>
+        <div class="mg-items">
+          <div class="mg-item"><span class="mg-item-name">링크 공유 (앱 설치 불필요)</span><span class="mg-item-badge badge-std">URL</span></div>
+          <div class="mg-item"><span class="mg-item-name">관계별 맞춤 메시지</span><span class="mg-item-badge badge-std">자동 생성</span></div>
+          <div class="mg-item"><span class="mg-item-name">측정 결과 카드 전송</span><span class="mg-item-badge badge-std">공유</span></div>
+          <div class="mg-item"><span class="mg-item-name">수신자 즉시 측정 유도</span><span class="mg-item-badge badge-std">연결</span></div>
+        </div>
+      </div>
+
+      <div class="metric-group reveal reveal-delay-2">
+        <div class="mg-header trend">
+          <div class="mg-icon">📈</div>
+          <div class="mg-title">시계열 추이 분석</div>
+        </div>
+        <div class="mg-items">
+          <div class="mg-item"><span class="mg-item-name">7일 · 30일 · 90일 그래프</span><span class="mg-item-badge badge-std">추이</span></div>
+          <div class="mg-item"><span class="mg-item-name">HR · HRV 변화 추이</span><span class="mg-item-badge badge-std">그래프</span></div>
+          <div class="mg-item"><span class="mg-item-name">스트레스 단계 추이</span><span class="mg-item-badge badge-std">그래프</span></div>
+          <div class="mg-item"><span class="mg-item-name">🆕 혈관 나이 추이</span><span class="mg-item-badge badge-new">신규</span></div>
+          <div class="mg-item"><span class="mg-item-name">🆕 RSA 미주신경 추이</span><span class="mg-item-badge badge-new">신규</span></div>
+          <div class="mg-item"><span class="mg-item-name">평소 대비 변화 인사이트</span><span class="mg-item-badge badge-ai">AI 분석</span></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- 안전 원칙 -->
+<div class="safety-bar section-full">
+  <div class="safety-inner">
+    <div class="eyebrow" style="color:rgba(244,242,237,.3)">의료 윤리 & 안전</div>
+    <h2 class="section-title" style="color:var(--paper);font-size:2rem">믿을 수 있는 건강 앱의 원칙</h2>
+    <div class="safety-grid">
+      <div class="safety-item reveal">
+        <div class="si-icon">⚕️</div>
+        <div>
+          <div class="si-title">의료 진단 아님</div>
+          <div class="si-desc">모든 결과는 건강 참고용입니다. "당신은 ○○" 같은 진단 언어 없이 중립적 수치와 경향만 제공합니다.</div>
+        </div>
+      </div>
+      <div class="safety-item reveal reveal-delay-1">
+        <div class="si-icon">🔒</div>
+        <div>
+          <div class="si-title">데이터 기기 내 저장</div>
+          <div class="si-desc">개인 건강 데이터는 서버에 전송되지 않습니다. 측정 기록은 기기 내부 로컬 스토리지에만 저장됩니다.</div>
+        </div>
+      </div>
+      <div class="safety-item reveal reveal-delay-2">
+        <div class="si-icon">🆘</div>
+        <div>
+          <div class="si-title">위기 감지 시 연결</div>
+          <div class="si-desc">감정 측정에서 위기 신호가 감지되면 정신건강 위기상담 전화(1393 · 1577-0199)를 즉시 안내합니다.</div>
+        </div>
+      </div>
+      <div class="safety-item reveal reveal-delay-3">
+        <div class="si-icon">👴</div>
+        <div>
+          <div class="si-title">노인 친화 설계</div>
+          <div class="si-desc">큰 글씨, 직관적 UI, 쉬운 한국어 해설로 디지털 기기에 익숙하지 않은 어르신도 혼자서 사용할 수 있습니다.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- INSIGHTS -->
+<section class="sec wh" id="insights">
+  <div class="inner">
+    <div class="insight-split">
+      <div>
+        <div class="eyebrow rv">INSIGHTS</div>
+        <h2 class="h2 rv d1">"그래서 내가<br><span class="a">건강한가요?"</span>에<br>답합니다</h2>
+        <p class="lead rv d2" style="margin-bottom:26px">숫자만 보여주지 않습니다. 또래와 비교하고, 어제와 비교하고, 자율신경 나이로 표현합니다. 측정이 끝나면 지금 당장 할 수 있는 행동을 제안합니다.</p>
+        <div class="ichips">
+          <div class="ich rv">
+            <div class="ich-ico">👥</div>
+            <div class="ich-body">
+              <div class="ich-title">또래 건강 백분위</div>
+              <div class="ich-desc">같은 나이대 평균과 비교해 "상위 N%"로 표현합니다. 나이대별 정규분포 CDF 기반 계산.</div>
+            </div>
+            <div class="ich-badge" style="background:#EEF2FF;color:#4338CA">정규분포</div>
+          </div>
+          <div class="ich rv d1">
+            <div class="ich-ico">📈</div>
+            <div class="ich-body">
+              <div class="ich-title">어제 대비 변화 추적</div>
+              <div class="ich-desc">전날 측정 기록과 자동 비교해 "+3점 향상"처럼 직관적으로 표시합니다.</div>
+            </div>
+            <div class="ich-badge" style="background:#F0FDF4;color:#166534">트렌드</div>
+          </div>
+          <div class="ich rv d2">
+            <div class="ich-ico">🧬</div>
+            <div class="ich-body">
+              <div class="ich-title">자율신경 건강 나이 (ANS Age)</div>
+              <div class="ich-desc">RMSSD 기반 자율신경 나이 역산. "자율신경 나이 36세"가 "RMSSD 42ms"보다 직관적입니다.</div>
+            </div>
+            <div class="ich-badge" style="background:#FFF7ED;color:#9A3412">Voss 2015</div>
+          </div>
+          <div class="ich rv d3">
+            <div class="ich-ico">💡</div>
+            <div class="ich-body">
+              <div class="ich-title">측정 완료 후 행동 추천</div>
+              <div class="ich-desc">HRV가 낮으면 복식호흡, 높으면 운동 강도 UP. 학술 근거와 함께 구체적 행동 3가지를 제안합니다.</div>
+            </div>
+            <div class="ich-badge" style="background:#F5F3FF;color:#6B3FA0">AI 추천</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="iscr rv d2">
+        <div class="iscr-hd">
+          <div class="iscr-title">📊 종합 건강 점수</div>
+          <div class="iscr-badge">87% 완료</div>
+        </div>
+        <div class="big-score">
+          <div class="big-score-num">87</div>
+          <div class="big-score-sub">종합 건강 점수 · 등급 A</div>
+        </div>
+        <div class="iscr-chips">
+          <div class="iscr-chip cp-peer">👥 또래 상위 22%</div>
+          <div class="iscr-chip cp-up">📈 어제보다 +3점</div>
+          <div class="iscr-chip cp-ans">🧬 자율신경 나이 36세</div>
+        </div>
+        <div class="prog"><div class="prog-fill" style="width:87%"></div></div>
+        <div class="iscr-metrics">
+          <div class="im">
+            <div class="im-lbl">❤️ Heart Rate</div>
+            <div class="im-val" style="color:#10b981">68<span class="im-unit">bpm</span></div>
+            <div class="im-sub">정상 범위</div>
+          </div>
+          <div class="im">
+            <div class="im-lbl">💓 HRV (RMSSD)</div>
+            <div class="im-val" style="color:#00C4B4">42<span class="im-unit">ms</span></div>
+            <div class="im-sub">또래 +10%</div>
+          </div>
+          <div class="im">
+            <div class="im-lbl">⚖️ 균형</div>
+            <div class="im-val" style="color:#7C5CFC">92<span class="im-unit">점</span></div>
+            <div class="im-sub">낙상위험 낮음</div>
+          </div>
+          <div class="im">
+            <div class="im-lbl">🧬 신체 나이</div>
+            <div class="im-val" style="color:#F59E0B">41<span class="im-unit">세</span></div>
+            <div class="im-sub">실제보다 -3년</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- GAMIFICATION -->
+<section class="sec gy">
+  <div class="inner">
+    <div class="game-split">
+      <div>
+        <div class="eyebrow rv">GAMIFICATION</div>
+        <h2 class="h2 rv d1">매일 돌아오게 만드는<br><span class="a">건강 습관 설계</span></h2>
+        <p class="lead rv d2" style="margin-bottom:26px">한 번 측정하고 끝나는 앱이 아닙니다. 연속 측정 스트릭과 배지, 주간 목표로 꾸준한 건강 추적 습관을 형성합니다.</p>
+        <div class="gfeats">
+          <div class="gf rv">
+            <div class="gf-icon">🏆</div>
+            <div><div class="gf-title">주간 목표 진행 카드</div><div class="gf-desc">이번 주 실제 측정 기록을 집계해 원형 링 진행률로 보여줍니다. 목표까지 남은 일수를 실시간으로 확인합니다.</div></div>
+          </div>
+          <div class="gf rv d1">
+            <div class="gf-icon">🔥</div>
+            <div><div class="gf-title">연속 측정 스트릭</div><div class="gf-desc">3일·7일·30일 연속 측정 시 특별 배지를 획득합니다. 🌱→✨→🔥→👑 단계로 성장합니다.</div></div>
+          </div>
+          <div class="gf rv d2">
+            <div class="gf-icon">🎯</div>
+            <div><div class="gf-title">11가지 배지 컬렉션</div><div class="gf-desc">첫 걸음·심혈관 마스터·균형 감각·실제보다 젊은 신체 나이 등 학술 기준을 달성하면 배지를 획득합니다.</div></div>
+          </div>
+          <div class="gf rv d3">
+            <div class="gf-icon">💬</div>
+            <div><div class="gf-title">카드별 동기부여 멘트</div><div class="gf-desc">측정 카드마다 "매일 기록하면 변화를 볼 수 있어요" 같은 개인화 멘트로 재방문을 유도합니다.</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="game-card rv d2">
+        <div class="wgoal">
+          <div class="wg-trophy">🏆</div>
+          <div>
+            <div class="wg-t">이번 주 목표까지 <span style="color:#EF4444">2일</span> 남았어요!</div>
+            <div class="wg-s">꾸준한 기록이 건강한 나를 만듭니다 💪</div>
+          </div>
+          <div class="wg-ring-wrap">
+            <svg width="48" height="48" viewBox="0 0 44 44">
+              <circle fill="none" stroke="rgba(245,158,11,.15)" stroke-width="5" cx="22" cy="22" r="18"/>
+              <circle fill="none" stroke="#F59E0B" stroke-width="5" stroke-linecap="round" cx="22" cy="22" r="18" stroke-dasharray="113" stroke-dashoffset="28" style="transform:rotate(-90deg);transform-origin:50% 50%"/>
+            </svg>
+            <div class="wg-pct">75%</div>
+          </div>
+        </div>
+        <div class="badge-row">
+          <div class="bdg"><div class="bdg-em">🌱</div><div class="bdg-nm">첫 걸음</div></div>
+          <div class="bdg"><div class="bdg-em">💗</div><div class="bdg-nm">심혈관</div></div>
+          <div class="bdg"><div class="bdg-em">⚖️</div><div class="bdg-nm">균형감각</div></div>
+          <div class="bdg"><div class="bdg-em">🔥</div><div class="bdg-nm">7일 연속</div></div>
+        </div>
+        <div class="streak">
+          <div style="font-size:26px">🔥</div>
+          <div><div class="streak-t">7일 연속 측정 중!</div><div class="streak-s">대단해요! 건강 습관이 자리잡았어요</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- NEW FEATURES v19.4 -->
+<section class="sec dk">
+  <div class="inner">
+    <div class="eyebrow rv">NEW IN v19.4</div>
+    <h2 class="h2 rv d1">경쟁자가 <span class="a">아직 못 하는 것</span></h2>
+    <p class="lead rv d2">추가 기기·추가 부담 없이 기존 30초 얼굴 측정에 자동으로 추가됩니다.</p>
+    <div class="new-grid">
+      <div class="nf rv d1">
+        <div class="nf-tag t-auto">자동 포함</div>
+        <div class="nf-icon">👁️</div>
+        <div class="nf-title">동공 변동성 분석</div>
+        <div class="nf-desc">얼굴 측정 30초 동안 동공 크기 변동을 추적합니다. Pupillary Unrest Index(PUI)로 자율신경 반응성을 정량화합니다. HRV와 독립된 자율신경 추가 채널입니다.</div>
+        <div class="nf-mets">
+          <div class="nfm"><div class="nfm-l">PUI</div><div class="nfm-v">87</div><div class="nfm-r">안정적</div></div>
+          <div class="nfm"><div class="nfm-l">좌우대칭</div><div class="nfm-v">94%</div><div class="nfm-r">정상</div></div>
+        </div>
+        <div class="nf-cite">Wilhelm (1998) Pupillary Unrest Index</div>
+      </div>
+      <div class="nf rv d2">
+        <div class="nf-tag t-auto">자동 포함</div>
+        <div class="nf-icon">😊</div>
+        <div class="nf-title">표정 Action Unit 분석</div>
+        <div class="nf-desc">Facial Action Coding System(FACS) 기반 AU1·4·6·12를 추정합니다. Duchenne 미소(진짜 미소)를 검출해 감정 자기보고의 객관적 검증에 활용합니다.</div>
+        <div class="nf-mets">
+          <div class="nfm"><div class="nfm-l">Duchenne</div><div class="nfm-v">78%</div><div class="nfm-r">긍정적</div></div>
+          <div class="nfm"><div class="nfm-l">일관성</div><div class="nfm-v">92%</div><div class="nfm-r">높음</div></div>
+        </div>
+        <div class="nf-cite">Ekman & Friesen (1978) FACS</div>
+      </div>
+      <div class="nf rv d3">
+        <div class="nf-tag t-sel">선택 측정</div>
+        <div class="nf-icon">🎤</div>
+        <div class="nf-title">음성 분석 (선택)</div>
+        <div class="nf-desc">측정 완료 후 "5초만 발성해주세요" 버튼이 등장합니다. Praat 알고리즘 포팅으로 Jitter·Shimmer·HNR을 분석합니다. 우울·파킨슨 조기 신호의 참고 지표. Anura도 없는 기능.</div>
+        <div class="nf-mets">
+          <div class="nfm"><div class="nfm-l">Jitter</div><div class="nfm-v">0.8%</div><div class="nfm-r">&lt;1% 정상</div></div>
+          <div class="nfm"><div class="nfm-l">HNR</div><div class="nfm-v">22dB</div><div class="nfm-r">&gt;20dB 정상</div></div>
+        </div>
+        <div class="nf-cite">Praat acoustic analysis algorithm</div>
+      </div>
+      <div class="nf rv d4">
+        <div class="nf-tag t-ai">측정 후 케어</div>
+        <div class="nf-icon">💡</div>
+        <div class="nf-title">측정 후 인사이트 카드</div>
+        <div class="nf-desc">측정 완료 0.8초 후 바텀시트로 자동 등장합니다. HRV 상태에 따라 복식호흡·4-7-8 호흡법·운동 강도 UP 등 학술 근거 기반 행동 3가지를 제안합니다.</div>
+        <div class="nf-mets">
+          <div class="nfm"><div class="nfm-l">행동 추천</div><div class="nfm-v">3가지</div><div class="nfm-r">매 측정</div></div>
+          <div class="nfm"><div class="nfm-l">다음 측정</div><div class="nfm-v">유도</div><div class="nfm-r">리텐션↑</div></div>
+        </div>
+        <div class="nf-cite">Grossman 2007 · Voss 2015 기반 분기 로직</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TECH -->
+<section class="sec dk" id="tech">
+  <div class="inner">
+    <div class="eyebrow rv">TECHNOLOGY</div>
+    <h2 class="h2 rv d1 center">임상 연구 기반<br><span class="a">24개 학술 지표</span></h2>
+    <p class="lead rv d2 center" style="margin:0 auto">Whoop·Oura 수준의 알고리즘을 스마트폰 카메라와 센서만으로 구현했습니다.</p>
+    <div class="tech-grid">
+      <div class="titem rv"><div class="titem-ico">🤖</div><div class="titem-name">ME-rPPG</div><div class="titem-desc">State Space Duality 기반 최신 rPPG. ONNX Runtime Web 온디바이스 추론.</div><div class="titem-badge">Apache 2.0</div></div>
+      <div class="titem rv d1"><div class="titem-ico">🎯</div><div class="titem-name">BlazeFace</div><div class="titem-desc">MediaPipe 경량 얼굴 검출. 실시간 바운딩 박스 + 키포인트 추출.</div><div class="titem-badge">Google MediaPipe</div></div>
+      <div class="titem rv d2"><div class="titem-ico">📐</div><div class="titem-name">Kalman Filter</div><div class="titem-desc">얼굴 박스 안정화 + HR 수렴 추적. Welch PSD 주파수 도메인 분석.</div><div class="titem-badge">실시간 신호처리</div></div>
+      <div class="titem rv d3"><div class="titem-ico">📊</div><div class="titem-name">Poincaré Plot</div><div class="titem-desc">SD1/SD2 비율로 부정맥 리스크 정량화. Brennan 2001 기준.</div><div class="titem-badge">Brennan 2001</div></div>
+      <div class="titem rv"><div class="titem-ico">🫀</div><div class="titem-name">RSA 분석</div><div class="titem-desc">호흡성 동성 부정맥으로 미주신경 활성도 측정. Grossman 2007.</div><div class="titem-badge">Grossman 2007</div></div>
+      <div class="titem rv d1"><div class="titem-ico">🩺</div><div class="titem-name">AIx 혈관 나이</div><div class="titem-desc">PPG 파형 증강 지수(AIx)로 혈관 경직도 추정. Millasseau 2002.</div><div class="titem-badge">Millasseau 2002</div></div>
+      <div class="titem rv d2"><div class="titem-ico">🏃</div><div class="titem-name">Romberg Test</div><div class="titem-desc">눈 뜨고/감고 가속도 데이터로 균형 능력·낙상 위험도 산출.</div><div class="titem-badge">Springer 2007</div></div>
+      <div class="titem rv d3"><div class="titem-ico">🧬</div><div class="titem-name">PhenoAge 모델</div><div class="titem-desc">Levine 2013 다중 바이오마커 통합 신체 나이 계산.</div><div class="titem-badge">Levine 2013</div></div>
+    </div>
+    <div class="disclaimer-box rv">
+      <div class="dsc-ico">⚠️</div>
+      <div class="dsc-text">
+        <strong>의료기기 아님 안내:</strong> YoungButton은 의료기기가 아닌 건강 참고용 도구입니다. 측정 결과는 의료적 진단·치료의 근거로 사용할 수 없습니다. 건강에 이상이 있다고 느끼실 경우 반드시 의료 전문가와 상담하세요. 모든 학술 근거 지표는 연구 목적의 참고값으로, 개인차가 존재합니다.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- COMPARISON -->
+<section class="sec dk" id="compare">
+  <div class="inner" style="max-width:860px">
+    <div class="eyebrow rv center">COMPARISON</div>
+    <h2 class="h2 rv d1 center">경쟁 서비스 대비<br><span class="a">무엇이 다른가요?</span></h2>
+    <div class="cmp-wrap rv d2">
+      <table class="cmp-tbl">
+        <thead>
+          <tr>
+            <th style="text-align:left">기능</th>
+            <th class="ours">YoungButton</th>
+            <th>Anura</th>
+            <th>Samsung Health</th>
+            <th>Apple Health</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>rPPG 심박·HRV</td><td class="ours"><span class="ck">✓</span></td><td><span class="ck">✓</span></td><td><span class="pt">△ 워치</span></td><td><span class="pt">△ 워치</span></td></tr>
+          <tr><td>혈관 나이(AIx)</td><td class="ours"><span class="ck">✓</span></td><td><span class="pt">△ 일부</span></td><td><span class="xx">✕</span></td><td><span class="xx">✕</span></td></tr>
+          <tr><td>부정맥 조기 감지</td><td class="ours"><span class="ck">✓</span></td><td><span class="xx">✕</span></td><td><span class="pt">△ 워치</span></td><td><span class="pt">△ 워치</span></td></tr>
+          <tr><td>균형·보행·신체기능</td><td class="ours"><span class="ck">✓ 6종</span></td><td><span class="xx">✕</span></td><td><span class="pt">△ 걸음수</span></td><td><span class="pt">△ 걸음수</span></td></tr>
+          <tr><td>동공 변동성 분석</td><td class="ours"><span class="ck">✓ 신규</span></td><td><span class="xx">✕</span></td><td><span class="xx">✕</span></td><td><span class="xx">✕</span></td></tr>
+          <tr><td>음성 Jitter/Shimmer</td><td class="ours"><span class="ck">✓ 선택</span></td><td><span class="xx">✕</span></td><td><span class="xx">✕</span></td><td><span class="xx">✕</span></td></tr>
+          <tr><td>또래 건강 백분위</td><td class="ours"><span class="ck">✓</span></td><td><span class="xx">✕</span></td><td><span class="xx">✕</span></td><td><span class="xx">✕</span></td></tr>
+          <tr><td>자율신경 건강 나이</td><td class="ours"><span class="ck">✓ ANS Age</span></td><td><span class="xx">✕</span></td><td><span class="xx">✕</span></td><td><span class="xx">✕</span></td></tr>
+          <tr><td>측정 후 행동 추천</td><td class="ours"><span class="ck">✓ AI</span></td><td><span class="pt">△ 일부</span></td><td><span class="pt">△ 일부</span></td><td><span class="xx">✕</span></td></tr>
+          <tr><td>추가 기기 필요</td><td class="ours" style="color:var(--mint);font-weight:800">불필요</td><td>불필요</td><td>워치 필요</td><td>워치 필요</td></tr>
+          <tr><td>가격</td><td class="ours" style="color:var(--mint);font-weight:800">완전 무료</td><td>유료</td><td>무료</td><td>무료</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section class="sec wh">
+  <div class="inner">
+    <div class="eyebrow rv center">REVIEWS</div>
+    <h2 class="h2 rv d1 center">사용자들의 <span class="a" style="color:var(--mintdk)">이야기</span></h2>
+    <div class="testi-grid">
+      <div class="tcard rv">
+        <div class="tcard-stars">★★★★★</div>
+        <div class="tcard-text">"병원 가기 전 간단히 확인하는 용도로 씁니다. 또래 대비 HRV 수치를 보여주니 막연한 숫자 대신 '내가 상위 30%구나'를 알 수 있어서 좋아요."</div>
+        <div class="tcard-who"><div class="tcard-avatar">👨</div><div><div class="tcard-name">김0준 님</div><div class="tcard-role">46세 · 직장인</div></div></div>
+      </div>
+      <div class="tcard rv d1">
+        <div class="tcard-stars">★★★★★</div>
+        <div class="tcard-text">"부모님 건강이 걱정됐는데 측정 결과를 링크로 보내주시면 제가 확인할 수 있어서 안심돼요. '어머니 오늘도 측정하셨네' 하면서 연락하게 됩니다."</div>
+        <div class="tcard-who"><div class="tcard-avatar">👩</div><div><div class="tcard-name">이0진 님</div><div class="tcard-role">34세 · 두 아이 엄마</div></div></div>
+      </div>
+      <div class="tcard rv d2">
+        <div class="tcard-stars">★★★★☆</div>
+        <div class="tcard-text">"운동한 날은 HRV가 높고, 야근한 날은 낮아요. 어제 대비 변화를 보여주니 생활 습관이랑 연결이 돼서 동기부여가 됩니다."</div>
+        <div class="tcard-who"><div class="tcard-avatar">🧑</div><div><div class="tcard-name">박0립 님</div><div class="tcard-role">28세 · 운동 애호가</div></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <div class="eyebrow reveal" style="text-align:center">지금 바로</div>
+  <h2 class="section-title reveal reveal-delay-1">오늘의 내 몸 상태<br>지금 확인하세요</h2>
+  <p class="section-desc reveal reveal-delay-2">설치 없이, 무료로, 30초 만에.</p>
+  <div class="cta-actions reveal reveal-delay-3">
+    <a href="https://young-button.vercel.app/" class="btn-primary" target="_blank">
+      <span>📱</span> 무료로 측정 시작
+    </a>
+  </div>
+  <div class="cta-url reveal reveal-delay-4">
+    <a href="https://young-button.vercel.app/" target="_blank">young-button.vercel.app</a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div>
+    <div class="footer-logo">Young<span>Button</span></div>
+    <div style="margin-top:8px;font-size:.78rem;color:rgba(244,242,237,.35)">v18.0 · ME-rPPG 딥러닝 건강 측정 PWA</div>
+  </div>
+  <div class="footer-note">
+<p style="text-align: center;">⏱ Reset Button 기획_개발: 남승우.<br>
+    💌문의: iamnsw@naver.com. <br></p>
+   <p style="margin-top:8px;font-size:.78rem;color:rgba(244,242,237,.35)">⚠️ 이 서비스는 건강 참고용이며 의료기기가 아닙니다. 측정 결과는 의학적 진단·처방을 대체하지 않습니다.
+    지속되는 증상은 반드시 전문의와 상담하세요.</p>
+  </div>
+  <div class="footer-links">
+    <a href="https://young-button.vercel.app/" target="_blank">앱 바로가기</a>
+  </div>
+</footer>
+
+<script>
+// 스크롤 애니메이션
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.classList.add('visible');
+      observer.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.12 });
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+// 폰 목업 메트릭 숫자 카운트업
+function countUp(el, target, duration) {
+  let start = 0;
+  const step = target / (duration / 16);
+  const timer = setInterval(() => {
+    start += step;
+    el.textContent = Math.round(Math.min(start, target));
+    if (start >= target) clearInterval(timer);
+  }, 16);
+}
+
+// 폰이 보이면 카운트업
+const phoneObserver = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      document.querySelectorAll('.pm-val').forEach(el => {
+        const t = parseInt(el.textContent);
+        countUp(el, t, 1200);
+      });
+      phoneObserver.disconnect();
+    }
+  });
+}, { threshold: .5 });
+const phone = document.querySelector('.phone-mockup');
+if (phone) phoneObserver.observe(phone);
+
+// 감정 카드 랜덤 하이라이트
+const emCards = document.querySelectorAll('.fv-em-card');
+let current = 0;
+setInterval(() => {
+  emCards.forEach(c => c.classList.remove('selected'));
+  current = (current + 1) % emCards.length;
+  emCards[current].classList.add('selected');
+}, 1800);
+
+// 네비 스크롤 활성화
+const navLinks = document.querySelectorAll('.nav-links a');
+const sections = ['features','ai','howto','metrics'];
+window.addEventListener('scroll', () => {
+  const y = window.scrollY + 120;
+  sections.forEach((id, i) => {
+    const s = document.getElementById(id);
+    if (s && s.offsetTop <= y && (sections[i+1] ? document.getElementById(sections[i+1])?.offsetTop > y : true)) {
+      navLinks.forEach(a => a.style.opacity = '.7');
+      navLinks[i] && (navLinks[i].style.opacity = '1');
+    }
+  });
+});
+
+// ── v19 카운트 애니메이션 ──
+(function(){
+  const co = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (!e.isIntersecting) return;
+      const el = e.target;
+      const cnt = parseInt(el.dataset.cnt);
+      const sfx = el.dataset.sfx || '';
+      if (isNaN(cnt)) return;
+      const dur = 1200, t0 = performance.now();
+      const run = t => {
+        const p = Math.min((t-t0)/dur, 1);
+        el.textContent = Math.round((1-Math.pow(1-p,3))*cnt) + sfx;
+        if (p < 1) requestAnimationFrame(run);
+      };
+      requestAnimationFrame(run);
+      co.unobserve(el);
+    });
+  }, { threshold: 0.5 });
+  document.querySelectorAll('[data-cnt]').forEach(el => co.observe(el));
+})();
+// ── v19 rv scroll reveal ──
+(function(){
+  if (!document.querySelector('.rv')) return;
+  const ro = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('in'); });
+  }, { threshold: 0.10, rootMargin: '0px 0px -36px 0px' });
+  document.querySelectorAll('.rv').forEach(el => ro.observe(el));
+})();
+</script>
+</body>
+</html>
